@@ -2,7 +2,10 @@ const connection = require('./database/config.js');
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const port = 3001;
+const https = require('https')
+const http = require('http')
+const https_port = 443;
+const http_port = 80;
 
 app.use(cors());
 
@@ -18,4 +21,9 @@ app.get('/', function (req, res) {
     });
 });
 
-app.listen(port, () => console.log(`Talk to Me listening on port ${port}!`));
+app.post('/register', function (req, res) {
+    res.send({"Hello": "World"})
+})
+
+http.createServer(app).listen(http_port, () => {console.log(`Talk to Me listening on port ${http_port}!`)})
+https.createServer(app).listen(https_port, () => {console.log(`Talk to Me listening on port ${https_port}!`)})
