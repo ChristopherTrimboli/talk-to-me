@@ -8,6 +8,7 @@ import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
 import NavDrawer from './NavDrawer';
 import LoginDialog from './LoginDialog';
+import RegisterDialog from './RegisterDialog';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -34,11 +35,13 @@ const Navbar = (props) => {
           <Typography variant="h6" className={classes.title}>
             Talk to Me
           </Typography>
+          <Button onClick={() => props.toggleRegisterDialog()} color="inherit">Register</Button>
           <Button onClick={() => props.toggleLoginDialog()} color="inherit">Login</Button>
         </Toolbar>
       </AppBar>
       <NavDrawer { ...props }/>
       <LoginDialog { ...props }/>
+      <RegisterDialog {...props} />
     </div>
   );
 }

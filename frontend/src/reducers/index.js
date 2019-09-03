@@ -6,7 +6,9 @@ export default (state = defaultState, action) => {
         case ACTIONS.TOGGLE_NAV_DRAWER:
             return state.setIn(['navDrawer'], !state.getIn(['navDrawer']));
         case ACTIONS.TOGGLE_LOGIN_DIALOG:
-                return state.setIn(['loginDialog'], !state.getIn(['loginDialog']));
+            return state.setIn(['loginDialog', 'visible'], !state.getIn(['loginDialog', 'visible']));
+        case ACTIONS.TOGGLE_REGISTER_DIALOG:
+            return state.setIn(['registerDialog', 'visible'], !state.getIn(['registerDialog', 'visible']));
         default:
             return state;
     }

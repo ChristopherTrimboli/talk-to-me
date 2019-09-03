@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors');
 const port = 3001;
 
-app.use(cors())
+app.use(cors());
 
 app.get('/', function (req, res) {
     connection.query('SELECT * from users', function (error, results, fields) {
@@ -13,9 +13,9 @@ app.get('/', function (req, res) {
             throw error;
         }
         else{
-            res.status(200).send(results[0])
+            res.status(200).send(results[0]);
         }
     });
-})
+});
 
-app.listen(port, () => console.log(`Talk to Me listening on port ${port}!`))
+app.listen(port, () => console.log(`Talk to Me listening on port ${port}!`));

@@ -7,8 +7,13 @@ const navDrawerGetter = () => {
 }
 
 const loginDialogGetter = () => {
-    return getter(['loginDialog'])
+    return getter(['loginDialog', 'visible'])
+}
+
+const registerDialogGetter = () => {
+    return getter(['registerDialog', 'visible'])
 }
 
 export const getNavDrawer = navDrawerGetter();
 export const getLoginDialog = loginDialogGetter();
+export const getRegisterDialog = registerDialogGetter();
