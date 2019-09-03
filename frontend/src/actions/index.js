@@ -1,16 +1,17 @@
 import * as ACTIONS from '../constants/actions.js';
 import {API_URL, API_PORT} from '../constants/enviroment.js';
 
-export const postData = (data, endpoint) => {
-    return dispatch => {
+export const postData = async (data, endpoint) => {
+    return async (dispatch) => {
         try{
-            fetch(API_URL + ':' + API_PORT + endpoint, {
+            await fetch(API_URL + ':' + API_PORT + endpoint, {
                 method: 'POST',
-                body: data
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             }).then((response) => {
-                return response.json()
-            }).then(json => {
-                console.log(json)
+                console.log(response)
             })
         }
         catch(error){
