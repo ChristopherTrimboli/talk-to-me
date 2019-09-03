@@ -1,14 +1,15 @@
 const mysql = require('mysql');
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
   host: 'localhost',
   port: '3306',
   user: 'root',
   password: 'HelloThere69',
   database: 'talk-to-me',
-  insecureAuth : true
+  insecureAuth : true,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-connection.connect();
-
-module.exports = connection;
+module.exports = pool;

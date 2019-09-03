@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Dialog from '@material-ui/core/Dialog';
@@ -7,6 +7,9 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 const LoginDialog = (props) => {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   return (
     <div>
@@ -20,6 +23,8 @@ const LoginDialog = (props) => {
             label="Email Address"
             type="email"
             fullWidth
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
           <TextField
             margin="dense"
@@ -27,13 +32,15 @@ const LoginDialog = (props) => {
             label="Password"
             type="password"
             fullWidth
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => props.toggleLoginDialog()} color="secondary">
             Cancel
           </Button>
-          <Button onClick={() => props.toggleLoginDialog()} color="primary">
+          <Button onClick={() => props.submitLogin(email, password)} color="primary">
             Login
           </Button>
         </DialogActions>

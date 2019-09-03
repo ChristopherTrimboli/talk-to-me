@@ -1,4 +1,4 @@
-const connection = require('./database/config.js');
+const pool = require('./database/config.js');
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', function (req, res) {
-    connection.query('SELECT * from users', function (error, results, fields) {
+    pool.query('SELECT * from users', function (error, results, fields) {
         if (error) {
             res.status(500).json(error);
             throw error;
@@ -23,26 +23,52 @@ app.get('/', function (req, res) {
     });
 });
 
-app.post('/register', async (req, res, next) => {
-    try{
-        const saltRounds = 10;
-        const hashedPass = await bcrypt.hash(req.body.password, saltRounds);
-        connection.query('INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)',
+app.post('/register', function (req, res, next) {
+    const saltRounds = 10;
+    bcrypt.hash(req.body.password, saltRounds, function(err, hashedPass) {
+        pool.query('INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)',
         [req.body.email, hashedPass, req.body.firstName, req.body.lastName],
         function (error, results, fields) {
             if (error) {
                 res.status(500).send(error);
-                throw error;
+                console.log(error)
+                next();
             }
             else {
-                res.status(200);
+                res.status(200).send();
                 next();
             }
         });
-    }
-    catch(error){
-        console.log(error)
-    }
+    });
+})
+
+app.post('/login', function (req, res, next) {
+    pool.query('SELECT * FROM users WHERE email = ?', [req.body.email],
+    function (error, results, fields) {
+        if (error) {
+            res.status(500).send(error);
+            console.log(error)
+            next();
+        }
+        else if(results.length > 0){ // if email exists check password hash
+            console.log(results[0])
+            bcrypt.compare(req.body.password, results[0].password, function(err, isMatch) {
+                if(isMatch === true){
+                    res.status(200).send();
+                    next();
+                }
+                else{
+                    res.status(500).send();
+                    next();
+                }
+            });
+
+        }
+        else{ // email does not exist
+            res.status(500).send();
+            next();
+        }
+    });
 })
 
 http.createServer(app).listen(http_port, () => { console.log(`Talk to Me listening on port: ${http_port}!`) })

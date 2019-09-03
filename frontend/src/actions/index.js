@@ -1,10 +1,10 @@
 import * as ACTIONS from '../constants/actions.js';
 import {API_URL, API_PORT} from '../constants/enviroment.js';
 
-export const postData = async (data, endpoint) => {
-    return async (dispatch) => {
+export const postData = (data, endpoint) => {
+    return dispatch => {
         try{
-            await fetch(API_URL + ':' + API_PORT + endpoint, {
+            fetch(API_URL + ':' + API_PORT + endpoint, {
                 method: 'POST',
                 body: JSON.stringify(data),
                 headers: {
@@ -35,6 +35,16 @@ export const toggleLoginDialog = () => {
     }
     return function(dispatch){
         dispatch(action)
+    }
+}
+
+export const submitLogin = (email, password) => {
+    return function(dispatch){
+        const data = {
+            email,
+            password
+        }
+        dispatch(postData(data, '/login'))
     }
 }
 
