@@ -12,6 +12,9 @@ export const postData = (data, endpoint) => {
                 }
             }).then((response) => {
                 console.log(response)
+                return response.json()
+            }).then((json) => {
+                console.log(json)
             })
         }
         catch(error){
