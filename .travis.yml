@@ -11,7 +11,6 @@ script:
   - ssh -o StrictHostKeyChecking=no -i talk-to-me.pem ec2-user@54.67.17.253 "rm talk-to-me -r && mkdir talk-to-me"
   - scp -o StrictHostKeyChecking=no -i talk-to-me.pem -r ./backend/* ec2-user@54.67.17.253:~/talk-to-me
   - ssh -o StrictHostKeyChecking=no -i talk-to-me.pem ec2-user@54.67.17.253 "cd talk-to-me && nvm use 12 && npm install && pm2 delete 0; pm2 start ."
-  - npm install -g flyway
   - ssh -o StrictHostKeyChecking=no -i talk-to-me.pem ec2-user@54.67.17.253 "cd talk-to-me && flyway -url=jdbc:mysql://talk-to-me.cilhwpqjm37r.us-west-1.rds.amazonaws.com:3306 -user=admin -password=$DATABASE_PASS -schemas=talk-to-me -locations=filesystem:database/sql migrate"
 deploy:
   provider: s3
