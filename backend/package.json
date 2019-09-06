@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev-migrate": "flyway -user=root -password=HelloThere69  -schemas=talk-to-me -url=jdbc:mysql://localhost:3306?useSSL=false -locations=filesystem:database/sql migrate"
+    "dev-migrate": "flyway -user=root -password=HelloThere69 -schemas=talk-to-me -url=jdbc:mysql://localhost:3306?useSSL=false -locations=filesystem:database/sql migrate"
   },
   "author": "Chris Eddy",
   "license": "ISC",
