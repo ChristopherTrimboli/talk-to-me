@@ -1,11 +1,16 @@
 language: node_js
 node_js:
   - 12
-install:
+script:
   - cd frontend
   - npm install
-script:
   - npm run build
+  - cd ..
+  - openssl enc -d -aes256 -in talk-to-me-encrypted.pem -out talk-to-me.pem -k $DECRYPT_PASS
+  - chmod 400 talk-to-me.pem
+  - ssh -o StrictHostKeyChecking=no -i talk-to-me.pem ec2-user@54.67.17.253 "rm talk-to-me -r && mkdir talk-to-me"
+  - scp -o StrictHostKeyChecking=no -i talk-to-me.pem -r ./backend/* ec2-user@54.67.17.253:~/talk-to-me
+  - ssh -o StrictHostKeyChecking=no -i talk-to-me.pem ec2-user@54.67.17.253 "cd talk-to-me && nvm use 12 && npm install && pm2 delete 0; pm2 start ."
 deploy:
   provider: s3
   access_key_id: $AWS_ACCESS_KEY
@@ -14,4 +19,4 @@ deploy:
   acl: public_read
   region: "us-west-1"
   skip_cleanup: true
-  local_dir: build
+  local_dir: frontend/build

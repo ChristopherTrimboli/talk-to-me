@@ -2,18 +2,15 @@ const pool = require('./database/config.js');
 const express = require('express');
 const app = express();
 const cors = require('cors');
-const https = require('https');
 const http = require('http');
 const bcrypt = require('bcrypt');
 const Promise = require('bluebird');
-const https_port = 443;
-const http_port = 80;
+const http_port = 3000;
 
 app.use(cors());
 app.use(express.json());
 
 http.createServer(app).listen(http_port, () => { console.log(`Talk to Me listening on port: ${http_port}!`) })
-https.createServer(app).listen(https_port, () => { console.log(`Talk to Me listening on port: ${https_port}!`) })
 
 const isEmailDuplicate = email => {
     return new Promise((resolve, reject) => {
