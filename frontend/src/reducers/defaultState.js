@@ -13,5 +13,10 @@ export default Immutable.fromJS({
         email: '',
         firstName: '',
         lastName: ''
+    },
+    snackbar: {
+        open: false,
+        variant: '',
+        message: ''
     }
 })

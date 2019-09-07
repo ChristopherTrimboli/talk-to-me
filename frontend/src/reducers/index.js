@@ -15,6 +15,11 @@ export default (state = defaultState, action) => {
             state = state.setIn(['userData', 'firstName'], action.userData.first_name);
             state = state.setIn(['userData', 'lastName'], action.userData.last_name);
             return state;
+        case ACTIONS.SET_SNACKBAR:
+            state = state.setIn(['snackbar', 'open'], action.open);
+            state = state.setIn(['snackbar', 'variant'], action.variant);
+            state = state.setIn(['snackbar', 'message'], action.message);
+            return state;
         default:
             return state;
     }

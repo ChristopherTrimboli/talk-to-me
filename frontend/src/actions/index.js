@@ -24,6 +24,18 @@ export const postData = async (data, endpoint) => {
     }
 }
 
+export const setSnackbar = (open, variant, message) => {
+    const action = {
+        type: ACTIONS.SET_SNACKBAR,
+        open: open,
+        variant: variant,
+        message: message
+    }
+    return function(dispatch){
+        dispatch(action)
+    }
+}
+
 export const toggleNavDrawer = () => {
     const action = {
         type: ACTIONS.TOGGLE_NAV_DRAWER
@@ -52,6 +64,15 @@ export const setUserData = (userData) => {
     }
 }
 
+export const toggleRegisterDialog = () => {
+    const action = {
+        type: ACTIONS.TOGGLE_REGISTER_DIALOG
+    }
+    return function(dispatch){
+        dispatch(action)
+    }
+}
+
 export const submitLogin = (email, password) => {
     return dispatch => {
         const data = {
@@ -63,20 +84,12 @@ export const submitLogin = (email, password) => {
             if(responseData.response.status === 200){
                 dispatch(toggleLoginDialog())
                 dispatch(setUserData(responseData.data.user))
+                dispatch(setSnackbar(true, 'success', 'Welcome ' + responseData.data.user.first_name + ' ' + responseData.data.user.last_name + ' :)'))
             }
             if(responseData.response.status === 500){
-                console.log('login failed bro, send error message to frontned, TO-DO')
+                dispatch(setSnackbar(true, 'error', 'Error Logging In :('))
             }
         })
-    }
-}
-
-export const toggleRegisterDialog = () => {
-    const action = {
-        type: ACTIONS.TOGGLE_REGISTER_DIALOG
-    }
-    return function(dispatch){
-        dispatch(action)
     }
 }
 
@@ -92,9 +105,10 @@ export const submitRegister = (email, password, firstName, lastName) => {
         .then(responseData => {
             if(responseData.response.status === 200){
                 dispatch(toggleRegisterDialog())
+                dispatch(setSnackbar(true, 'success', 'Registered :)'))
             }
             if(responseData.response.status === 500){
-                console.log('Register failed bro, send error message to frontned, TO-DO')
+                dispatch(setSnackbar(true, 'error', 'Error Registering :('))
             }
         })
     }

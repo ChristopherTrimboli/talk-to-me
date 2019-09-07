@@ -18,7 +18,12 @@ const userDataGetter = () => {
     return getter(['userData'])
 }
 
+const snackbarGetter = () => {
+    return getter(['snackbar'])
+}
+
 export const getNavDrawer = navDrawerGetter();
 export const getLoginDialog = loginDialogGetter();
 export const getRegisterDialog = registerDialogGetter();
 export const getUserData = userDataGetter();
+export const getSnackbar = snackbarGetter();
