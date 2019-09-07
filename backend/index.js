@@ -62,8 +62,8 @@ app.post('/register', async (req, res) => {
             const saltRounds = 10;
             bcrypt.hash(req.body.password, saltRounds, async (err, hashedPass) => {
                 await sqlQuery(
-                    'INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)',
-                    [req.body.email, hashedPass, req.body.firstName, req.body.lastName]
+                    'INSERT INTO users (email, password) VALUES (?, ?)',
+                    [req.body.email, hashedPass]
                 ).then(results => {
                     res.status(200).send({message: 'Registered succesfully'})
                 }).catch(error => {

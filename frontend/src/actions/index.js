@@ -60,13 +60,11 @@ export const toggleRegisterDialog = () => {
     }
 }
 
-export const submitRegister = (email, password, firstName, lastName) => {
+export const submitRegister = (email, password) => {
     return function(dispatch){
         const data = {
             email,
-            password,
-            firstName,
-            lastName
+            password
         }
         dispatch(postData(data, '/register'))
     }
