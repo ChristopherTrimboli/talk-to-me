@@ -7,7 +7,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     height: '100%',
     textAlign: 'center',
-    marginTop: '30%'
+    marginTop: '40vh'
   }
 }));
 
