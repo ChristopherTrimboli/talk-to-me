@@ -9,6 +9,12 @@ export default (state = defaultState, action) => {
             return state.setIn(['loginDialog', 'visible'], !state.getIn(['loginDialog', 'visible']));
         case ACTIONS.TOGGLE_REGISTER_DIALOG:
             return state.setIn(['registerDialog', 'visible'], !state.getIn(['registerDialog', 'visible']));
+        case ACTIONS.SET_USER_DATA:
+            state = state.setIn(['userData', 'loggedIn'], true);
+            state = state.setIn(['userData', 'email'], action.userData.email);
+            state = state.setIn(['userData', 'firstName'], action.userData.first_name);
+            state = state.setIn(['userData', 'lastName'], action.userData.last_name);
+            return state;
         default:
             return state;
     }

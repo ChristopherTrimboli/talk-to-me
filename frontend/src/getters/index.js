@@ -14,6 +14,11 @@ const registerDialogGetter = () => {
     return getter(['registerDialog', 'visible'])
 }
 
+const userDataGetter = () => {
+    return getter(['userData'])
+}
+
 export const getNavDrawer = navDrawerGetter();
 export const getLoginDialog = loginDialogGetter();
 export const getRegisterDialog = registerDialogGetter();
+export const getUserData = userDataGetter();

@@ -1,25 +1,26 @@
 import * as ACTIONS from '../constants/actions.js';
 import {API_URL, API_PORT} from '../constants/enviroment.js';
 
-export const postData = (data, endpoint) => {
-    return dispatch => {
-        try{
-            fetch(API_URL + ':' + API_PORT + endpoint, {
-                method: 'POST',
-                body: JSON.stringify(data),
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            }).then((response) => {
-                console.log(response)
-                return response.json()
-            }).then((json) => {
-                console.log(json)
-            })
+export const postData = async (data, endpoint) => {
+    try{
+        const response = await fetch(API_URL + ':' + API_PORT + endpoint, {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        const json = await response.json()
+        console.log(response);
+        console.log(json);
+        const responseData = {
+            response: response,
+            data: json
         }
-        catch(error){
-            console.log(error);
-        }
+        return(responseData)
+    }
+    catch(error){
+        console.log(error);
     }
 }
 
@@ -41,13 +42,32 @@ export const toggleLoginDialog = () => {
     }
 }
 
-export const submitLogin = (email, password) => {
+export const setUserData = (userData) => {
+    const action = {
+        type: ACTIONS.SET_USER_DATA,
+        userData: userData
+    }
     return function(dispatch){
+        dispatch(action)
+    }
+}
+
+export const submitLogin = (email, password) => {
+    return dispatch => {
         const data = {
             email,
             password
         }
-        dispatch(postData(data, '/login'))
+        postData(data, '/login')
+        .then(responseData => {
+            if(responseData.response.status === 200){
+                dispatch(toggleLoginDialog())
+                dispatch(setUserData(responseData.data.user))
+            }
+            if(responseData.response.status === 500){
+                console.log('login failed bro, send error message to frontned, TO-DO')
+            }
+        })
     }
 }
 
@@ -60,12 +80,22 @@ export const toggleRegisterDialog = () => {
     }
 }
 
-export const submitRegister = (email, password) => {
-    return function(dispatch){
+export const submitRegister = (email, password, firstName, lastName) => {
+    return dispatch => {
         const data = {
             email,
-            password
+            password,
+            firstName,
+            lastName
         }
-        dispatch(postData(data, '/register'))
+        postData(data, '/register')
+        .then(responseData => {
+            if(responseData.response.status === 200){
+                dispatch(toggleRegisterDialog())
+            }
+            if(responseData.response.status === 500){
+                console.log('Register failed bro, send error message to frontned, TO-DO')
+            }
+        })
     }
 }

@@ -40,7 +40,7 @@ const LoginDialog = (props) => {
           <Button onClick={() => props.toggleLoginDialog()} color="secondary">
             Cancel
           </Button>
-          <Button onClick={() => props.submitLogin(email, password)} color="primary">
+          <Button type="submit" onClick={() => props.submitLogin(email, password)} color="primary">
             Login
           </Button>
         </DialogActions>

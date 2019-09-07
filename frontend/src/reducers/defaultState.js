@@ -3,11 +3,15 @@ import Immutable from 'immutable'
 export default Immutable.fromJS({
     navDrawer: false,
     loginDialog: {
-        visible: false,
-        data: {}
+        visible: false
     },
     registerDialog: {
-        visible: false,
-        data: {}
+        visible: false
+    },
+    userData: {
+        loggedIn: false,
+        email: '',
+        firstName: '',
+        lastName: ''
     }
 })
