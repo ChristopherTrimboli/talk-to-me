@@ -10,6 +10,7 @@ export default Immutable.fromJS({
     },
     userData: {
         loggedIn: false,
+        id: null,
         email: '',
         firstName: '',
         lastName: ''

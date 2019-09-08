@@ -95,13 +95,11 @@ export const submitLogin = (email, password) => {
     }
 }
 
-export const submitRegister = (email, password, firstName, lastName) => {
+export const submitRegister = (email, password) => {
     return dispatch => {
         const data = {
             email,
-            password,
-            firstName,
-            lastName
+            password
         }
         postData(data, '/register')
         .then(responseData => {
@@ -111,6 +109,26 @@ export const submitRegister = (email, password, firstName, lastName) => {
             }
             if(responseData.response.status === 500){
                 dispatch(setSnackbar(true, 'error', 'Error Registering :('))
+            }
+        })
+    }
+}
+
+export const updateProfile = (userId, firstName, lastName) => {
+    return dispatch => {
+        const data = {
+            userId,
+            firstName,
+            lastName
+        }
+        postData(data, '/updateProfile')
+        .then(responseData => {
+            if(responseData.response.status === 200){
+                dispatch(setUserData(responseData.data.user))
+                dispatch(setSnackbar(true, 'success', 'Profile Updated! Welcome ' + responseData.data.user.first_name + ' ' + responseData.data.user.last_name + ' :)'))
+            }
+            if(responseData.response.status === 500){
+                dispatch(setSnackbar(true, 'error', 'Error Updating Profile :('))
             }
         })
     }

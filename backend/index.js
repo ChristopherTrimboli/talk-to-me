@@ -62,7 +62,7 @@ app.post('/register', async (req, res) => {
             const saltRounds = 10;
             bcrypt.hash(req.body.password, saltRounds, async (err, hashedPass) => {
                 await sqlQuery(
-                    'INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)',
+                    'INSERT INTO users (email, password) VALUES (?, ?)',
                     [req.body.email, hashedPass, req.body.firstName, req.body.lastName]
                 ).then(results => {
                     res.status(200).send({message: 'Registered succesfully'})
@@ -98,5 +98,28 @@ app.post('/login', async (req, res) => {
     }).catch(error => {
         res.status(500).send(error)
     })
+})
+
+app.post('/updateProfile', async (req, res) => {
+    if(!req.body.userId){
+        res.status(500).send({error: 'No userId sent, cant update profile, login and try again.'})
+    }
+    else{
+        await sqlQuery(
+            'UPDATE users SET first_name = ?, last_name = ? WHERE users.id = ?',
+            [req.body.firstName, req.body.lastName, req.body.userId]
+        ).then(async () => {
+            await sqlQuery(
+                'SELECT * FROM users WHERE id = ?', [req.body.userId]
+            ).then(results => {
+                delete results[0].password
+                res.status(200).send({message: 'Profile Updated', user: results[0]})
+            }).catch(error => {
+                res.status(500).send(error)
+            })
+        }).catch(error => {
+            res.status(500).send(error)
+        })
+    }
 })
 

@@ -10,8 +10,6 @@ const RegisterDialog = (props) => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
 
   return (
     <div>
@@ -39,32 +37,12 @@ const RegisterDialog = (props) => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <TextField
-            margin="dense"
-            id="firstName"
-            label="First Name"
-            type="text"
-            value={firstName}
-            fullWidth
-            onChange={(e) => setFirstName(e.target.value)}
-            required
-          />
-          <TextField
-            margin="dense"
-            id="lastName"
-            label="Last Name"
-            type="text"
-            value={lastName}
-            fullWidth
-            onChange={(e) => setLastName(e.target.value)}
-            required
-          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => props.toggleRegisterDialog()} color="secondary">
             Cancel
           </Button>
-          <Button onClick={() => props.submitRegister(email, password, firstName, lastName)} color="primary">
+          <Button onClick={() => props.submitRegister(email, password)} color="primary">
             Register
           </Button>
         </DialogActions>
