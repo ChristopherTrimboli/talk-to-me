@@ -128,6 +128,7 @@ app.post('/login', async (req, res) => {
                         res.status(200).send({message: 'Login Successful', token: token})
                     })
                     .catch(e => {
+                        console.log(e)
                         res.status(500).send({error: 'Token failed to sign'})
                     })
                 }
