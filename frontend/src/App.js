@@ -25,6 +25,7 @@ const App = (storeProps) => {
       lastName: tokenData.last_name
     }
     storeProps.setUserData(userData);
+    storeProps.setSnackbar(true, 'success', `Welcome ${userData.firstName} ${userData.lastName} :)`)
   }
 
   return (
