@@ -4,4 +4,3 @@ export const TOGGLE_REGISTER_DIALOG = 'TOGGLE_REGISTER_DIALOG';
 export const SUBMIT_REGISTER = 'SUBMIT_REGISTER';
 export const SET_USER_DATA = 'SET_USER_DATA';
 export const SET_SNACKBAR = 'SET_SNACKBAR';
-export const LOGOUT = 'LOGOUT';

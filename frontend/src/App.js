@@ -11,8 +11,22 @@ import { Route } from "react-router-dom";
 import FrontPage from './containers/FrontPage/index.js'
 import CreateProfile from './containers/CreateProfile/index.js'
 import { withRouter } from 'react-router-dom';
+import jwt from 'jsonwebtoken'
 
 const App = (storeProps) => {
+
+  if(!storeProps.userData.loggedIn && localStorage.getItem('token')){
+    const tokenData = jwt.decode(localStorage.getItem('token')).data
+    const userData = {
+      loggedIn: true,
+      id: tokenData.id,
+      email: tokenData.email,
+      firstName: tokenData.first_name,
+      lastName: tokenData.last_name
+    }
+    storeProps.setUserData(userData);
+  }
+
   return (
     <div className="App">
       <Navbar { ...storeProps }/>

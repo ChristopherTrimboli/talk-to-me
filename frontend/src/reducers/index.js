@@ -13,8 +13,8 @@ export default (state = defaultState, action) => {
             state = state.setIn(['userData', 'loggedIn'], action.userData.loggedIn);
             state = state.setIn(['userData', 'id'], action.userData.id);
             state = state.setIn(['userData', 'email'], action.userData.email);
-            state = state.setIn(['userData', 'firstName'], action.userData.first_name || action.userData.firstName);
-            state = state.setIn(['userData', 'lastName'], action.userData.last_name || action.userData.firstName);
+            state = state.setIn(['userData', 'firstName'], action.userData.firstName);
+            state = state.setIn(['userData', 'lastName'], action.userData.lastName);
             return state;
         case ACTIONS.SET_SNACKBAR:
             state = state.setIn(['snackbar', 'open'], action.open);

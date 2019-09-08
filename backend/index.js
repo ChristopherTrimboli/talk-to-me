@@ -5,12 +5,50 @@ const cors = require('cors');
 const http = require('http');
 const bcrypt = require('bcrypt');
 const Promise = require('bluebird');
+const jwt = require('jsonwebtoken');
 const http_port = 3000;
+const TOKEN_SECRET = process.env.NODE_ENV === "production" ? process.env.TOKEN_SECRET : 'verysecretsecret';
 
 app.use(cors());
 app.use(express.json());
 
 http.createServer(app).listen(http_port, () => { console.log(`Talk to Me listening on port: ${http_port}!`) })
+
+const signToken = (data) => {
+    return new Promise((resolve, reject) => {
+        try{
+            jwt.sign({data: data}, TOKEN_SECRET, {expiresIn: '1h'}, (error, token) => {
+                if(!error){
+                    resolve(token)
+                }
+                else{
+                    reject(error)
+                }
+            });
+        }
+        catch(e){
+            reject(e)
+        }
+    });
+}
+
+const verifyToken = (token) => {
+    return new Promise((resolve, reject) => {
+        try{
+            jwt.verify(token, TOKEN_SECRET, (error, token) => {
+                if(!error){
+                    resolve(true)
+                }
+                else{
+                    reject(error)
+                }
+            });
+        }
+        catch(e){
+            reject(e)
+        }
+    });
+}
 
 const isEmailDuplicate = email => {
     return new Promise((resolve, reject) => {
@@ -82,18 +120,24 @@ app.post('/login', async (req, res) => {
     await sqlQuery('SELECT * FROM users WHERE email = ?', [req.body.email])
     .then(results => {
         if(results.length > 0){
-            bcrypt.compare(req.body.password, results[0].password, function(err, isMatch) {
+            bcrypt.compare(req.body.password, results[0].password, async (err, isMatch) => {
                 if(isMatch){
                     delete results[0].password
-                    res.status(200).send({message: 'Login Successful', user: results[0]})
+                    await signToken(results[0])
+                    .then(token => {
+                        res.status(200).send({message: 'Login Successful', token: token})
+                    })
+                    .catch(e => {
+                        res.status(500).send({error: 'Token failed to sign'})
+                    })
                 }
                 else{
-                    res.status(500).send({message: 'Login failed, incorrect credentials'})
+                    res.status(500).send({error: 'Login failed, incorrect credentials'})
                 }
             });
         }
         else{
-            res.status(500).send({message: 'Login failed, email does not exist'})
+            res.status(500).send({error: 'Login failed, email does not exist'})
         }
     }).catch(error => {
         res.status(500).send(error)
@@ -101,25 +145,41 @@ app.post('/login', async (req, res) => {
 })
 
 app.post('/updateProfile', async (req, res) => {
-    if(!req.body.userId){
-        res.status(500).send({error: 'No userId sent, cant update profile, login and try again.'})
+    if(req.body.token){
+        await verifyToken(req.body.token)
+        .then(async (isValid) => {
+            if(isValid){
+                const token = jwt.decode(req.body.token);
+                await sqlQuery(
+                    'UPDATE users SET first_name = ?, last_name = ? WHERE users.id = ?',
+                    [req.body.firstName, req.body.lastName, token.data.id]
+                ).then(async () => {
+                    await sqlQuery(
+                        'SELECT * FROM users WHERE id = ?', [token.data.id]
+                    ).then(async (results) => {
+                        delete results[0].password
+                        await signToken(results[0])
+                        .then(token => {
+                            res.status(200).send({message: 'Profile Updated', token: token})
+                        })
+                        .catch(e => {
+                            res.status(500).send({error: 'Error signing token'})
+                        })
+                    }).catch(error => {
+                        res.status(500).send(error)
+                    })
+                }).catch(error => {
+                    res.status(500).send(error)
+                })
+            }
+        })
+        .catch(e => {
+            console.log(e)
+            res.status(500).send({error: 'Tokin not valid.'})
+        })
     }
     else{
-        await sqlQuery(
-            'UPDATE users SET first_name = ?, last_name = ? WHERE users.id = ?',
-            [req.body.firstName, req.body.lastName, req.body.userId]
-        ).then(async () => {
-            await sqlQuery(
-                'SELECT * FROM users WHERE id = ?', [req.body.userId]
-            ).then(results => {
-                delete results[0].password
-                res.status(200).send({message: 'Profile Updated', user: results[0]})
-            }).catch(error => {
-                res.status(500).send(error)
-            })
-        }).catch(error => {
-            res.status(500).send(error)
-        })
+        res.status(500).send({error: 'No token, Login and try again'})
     }
 })
 

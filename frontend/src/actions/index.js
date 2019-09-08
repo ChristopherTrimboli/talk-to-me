@@ -1,9 +1,11 @@
 import * as ACTIONS from '../constants/actions.js';
 import {API_URL, API_PORT} from '../constants/enviroment.js';
 import history from '../history.js'
+import jwt from 'jsonwebtoken'
 
 export const postData = async (data, endpoint) => {
     try{
+        data.token = localStorage.getItem('token');
         const response = await fetch(API_URL + ':' + API_PORT + endpoint, {
             method: 'POST',
             body: JSON.stringify(data),
@@ -86,8 +88,16 @@ export const submitLogin = (email, password) => {
         postData(data, '/login')
         .then(responseData => {
             if(responseData.response.status === 200){
-                dispatch(setUserData(responseData.data.user))
-                dispatch(setSnackbar(true, 'success', `Welcome ${responseData.data.user.first_name || ''} ${responseData.data.user.last_name || ''} :)`))
+                localStorage.setItem('token', responseData.data.token);
+                const token = jwt.decode(responseData.data.token);
+                const userData = {
+                    email: token.data.email,
+                    id: token.data.id,
+                    firstName: token.data.first_name,
+                    lastName: token.data.last_name
+                }
+                dispatch(setUserData(userData))
+                dispatch(setSnackbar(true, 'success', `Welcome ${userData.firstName || ''} ${userData.lastName || ''} :)`))
                 history.push("/createProfile");
             }
             if(responseData.response.status === 500){
@@ -120,9 +130,6 @@ export const submitRegister = (email, password) => {
 }
 
 export const logout = () => {
-    const action = {
-        type: ACTIONS.LOGOUT
-    }
     const emptyUser = {
         loggedIn: false,
         id: null,
@@ -131,7 +138,7 @@ export const logout = () => {
         lastName: ''
     }
     return function(dispatch){
-        dispatch(action)
+        localStorage.removeItem('token')
         dispatch(setUserData(emptyUser))
         dispatch(setSnackbar(true, 'info', 'Logged out... see you next time :/'))
         history.push('/')
@@ -148,8 +155,16 @@ export const updateProfile = (userId, firstName, lastName) => {
         postData(data, '/updateProfile')
         .then(responseData => {
             if(responseData.response.status === 200){
-                dispatch(setUserData(responseData.data.user))
-                dispatch(setSnackbar(true, 'success', 'Profile Updated! Welcome ' + responseData.data.user.first_name + ' ' + responseData.data.user.last_name + ' :)'))
+                localStorage.setItem('token', responseData.data.token);
+                const token = jwt.decode(responseData.data.token);
+                const userData = {
+                    email: token.data.email,
+                    id: token.data.id,
+                    firstName: token.data.first_name,
+                    lastName: token.data.last_name
+                }
+                dispatch(setUserData(userData))
+                dispatch(setSnackbar(true, 'success', 'Profile Updated! Welcome ' + userData.firstName + ' ' + userData.lastName + ' :)'))
             }
             if(responseData.response.status === 500){
                 dispatch(setSnackbar(true, 'error', 'Error Updating Profile :('))
