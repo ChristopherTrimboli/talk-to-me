@@ -2,9 +2,9 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-import Avatar from '@material-ui/core/Avatar';
-import Grid from '@material-ui/core/Grid';
-import emptyProfile from '../../assets/emptyProfile.jpg'
+// import Avatar from '@material-ui/core/Avatar';
+// import Grid from '@material-ui/core/Grid';
+// import emptyProfile from '../../assets/emptyProfile.jpg'
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -28,18 +28,18 @@ const getSteps = () => {
     return ['Create your Profile', 'Upload Pictures', 'Review'];
 }
   
-const getStepContent = (step) => {
-    switch (step) {
-        case 0:
-        return 'Tell us about yourself';
-        case 1:
-        return 'What is an ad group anyways?';
-        case 2:
-        return 'This is the bit I really care about!';
-        default:
-        return 'Unknown step';
-    }
-}
+// const getStepContent = (step) => {
+//     switch (step) {
+//         case 0:
+//         return 'Tell us about yourself';
+//         case 1:
+//         return 'What is an ad group anyways?';
+//         case 2:
+//         return 'This is the bit I really care about!';
+//         default:
+//         return 'Unknown step';
+//     }
+// }
 
 const CreateProfile = (props) => {
   const classes = useStyles();
@@ -85,11 +85,9 @@ const CreateProfile = (props) => {
     });
   }
 
-  function handleReset() {
-    setActiveStep(0);
-  }
-
-  console.log(props)
+  // function handleReset() {
+  //   setActiveStep(0);
+  // }
 
   return (
     <div className={classes.root}>
