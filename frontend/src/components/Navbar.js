@@ -53,6 +53,11 @@ const Navbar = (props) => {
     setAnchorEl(null);
   }
 
+  function logout() {
+    props.logout()
+    handleClose()
+  }
+
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -77,9 +82,8 @@ const Navbar = (props) => {
             open={Boolean(anchorEl)}
             onClose={handleClose}
           >
-            <MenuItem onClick={handleClose}><Link to="/createProfile" className={classes.link}>Create Profile</Link></MenuItem>
-            {/* <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem> */}
+            <MenuItem onClick={() => handleClose()}><Link to="/createProfile" className={classes.link}>Create Profile</Link></MenuItem>
+            <MenuItem onClick={() => logout()}>Logout</MenuItem>
           </Menu>
         </Toolbar>
       </AppBar>

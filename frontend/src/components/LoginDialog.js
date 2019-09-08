@@ -11,6 +11,11 @@ const LoginDialog = (props) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const submitLogin = () => {
+    props.submitLogin(email, password)
+    props.toggleLoginDialog()
+  }
+
   return (
     <div>
       <Dialog open={props.loginDialog} onClose={() => props.toggleLoginDialog()} aria-labelledby="form-dialog-title">
@@ -40,7 +45,7 @@ const LoginDialog = (props) => {
           <Button onClick={() => props.toggleLoginDialog()} color="secondary">
             Cancel
           </Button>
-          <Button type="submit" onClick={() => props.submitLogin(email, password)} color="primary">
+          <Button type="submit" onClick={() => submitLogin()} color="primary">
             Login
           </Button>
         </DialogActions>

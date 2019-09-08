@@ -56,6 +56,9 @@ export const toggleLoginDialog = () => {
 }
 
 export const setUserData = (userData) => {
+    if(userData.id){
+        userData.loggedIn = true;
+    }
     const action = {
         type: ACTIONS.SET_USER_DATA,
         userData: userData
@@ -83,9 +86,8 @@ export const submitLogin = (email, password) => {
         postData(data, '/login')
         .then(responseData => {
             if(responseData.response.status === 200){
-                dispatch(toggleLoginDialog())
                 dispatch(setUserData(responseData.data.user))
-                dispatch(setSnackbar(true, 'success', 'Welcome ' + responseData.data.user.first_name + ' ' + responseData.data.user.last_name + ' :)'))
+                dispatch(setSnackbar(true, 'success', `Welcome ${responseData.data.user.first_name || ''} ${responseData.data.user.last_name || ''} :)`))
                 history.push("/createProfile");
             }
             if(responseData.response.status === 500){
@@ -106,11 +108,33 @@ export const submitRegister = (email, password) => {
             if(responseData.response.status === 200){
                 dispatch(toggleRegisterDialog())
                 dispatch(setSnackbar(true, 'success', 'Registered :)'))
+                setTimeout(() => {
+                    dispatch(submitLogin(email, password))
+                }, 1500)
             }
             if(responseData.response.status === 500){
                 dispatch(setSnackbar(true, 'error', 'Error Registering :('))
             }
         })
+    }
+}
+
+export const logout = () => {
+    const action = {
+        type: ACTIONS.LOGOUT
+    }
+    const emptyUser = {
+        loggedIn: false,
+        id: null,
+        email: '',
+        firstName: '',
+        lastName: ''
+    }
+    return function(dispatch){
+        dispatch(action)
+        dispatch(setUserData(emptyUser))
+        dispatch(setSnackbar(true, 'info', 'Logged out... see you next time :/'))
+        history.push('/')
     }
 }
 
