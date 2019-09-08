@@ -10,7 +10,6 @@ const useStyles = makeStyles(theme => ({
     marginTop: '40vh'
   }
 }));
-
 const FrontPage = (props) => {
   const classes = useStyles();
 

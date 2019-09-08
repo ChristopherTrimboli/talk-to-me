@@ -1,5 +1,6 @@
 import * as ACTIONS from '../constants/actions.js';
 import {API_URL, API_PORT} from '../constants/enviroment.js';
+import history from '../history.js'
 
 export const postData = async (data, endpoint) => {
     try{
@@ -85,6 +86,7 @@ export const submitLogin = (email, password) => {
                 dispatch(toggleLoginDialog())
                 dispatch(setUserData(responseData.data.user))
                 dispatch(setSnackbar(true, 'success', 'Welcome ' + responseData.data.user.first_name + ' ' + responseData.data.user.last_name + ' :)'))
+                history.push("/createProfile");
             }
             if(responseData.response.status === 500){
                 dispatch(setSnackbar(true, 'error', 'Error Logging In :('))
