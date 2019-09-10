@@ -165,7 +165,7 @@ app.post('/updateProfile', async (req, res) => {
                     [req.body.firstName, req.body.lastName, req.body.gender, req.body.birthday, req.body.location, new Date(), token.data.id]
                 ).then(async () => {
                     await sqlQuery(
-                        'SELECT * FROM users WHERE id = ?', [token.data.id]
+                        'SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE id = ?', [token.data.id]
                     ).then(async results => {
                         delete results[0].password
                         await signToken(results[0])
