@@ -99,8 +99,8 @@ app.post('/register', async (req, res) => {
             const saltRounds = 10;
             bcrypt.hash(req.body.password, saltRounds, async (err, hashedPass) => {
                 await sqlQuery(
-                    'INSERT INTO users (email, password) VALUES (?, ?)',
-                    [req.body.email, hashedPass, req.body.firstName, req.body.lastName]
+                    'INSERT INTO users (email, password, registerDate) VALUES (?, ?, ?)',
+                    [req.body.email, hashedPass, new Date()]
                 ).then(results => {
                     res.status(200).send({message: 'Registered succesfully'})
                 }).catch(error => {
@@ -123,16 +123,22 @@ app.post('/login', async (req, res) => {
                 if(isMatch){
                     await sqlQuery('SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE email = ?', [req.body.email])
                     .then(async results => {
-                        await signToken(results[0])
-                        .then(token => {
-                            res.status(200).send({message: 'Login Successful', token: token})
+                        await sqlQuery('UPDATE users SET lastLoginDate = ? WHERE id = ?', [new Date(), results[0].id])
+                        .then(async () => {
+                            await signToken(results[0])
+                            .then(token => {
+                                res.status(200).send({message: 'Login Successful', token: token})
+                            })
+                            .catch(e => {
+                                res.status(500).send({error: 'Token failed to sign'})
+                            })
                         })
-                        .catch(e => {
-                            res.status(500).send({error: 'Token failed to sign'})
+                        .catch(error => {
+                            res.status(500).send(error) // Updating lastLoginTime failed
                         })
                     })
                     .catch(error => {
-                        res.status(500).send(error)
+                        res.status(500).send(error) // Selecting user data failed
                     })
                 }
                 else{
@@ -155,8 +161,8 @@ app.post('/updateProfile', async (req, res) => {
             if(isValid){
                 const token = jwt.decode(req.body.token);
                 await sqlQuery(
-                    'UPDATE users SET firstName = ?, lastName = ?, gender = ?, birthday = ?, location = ? WHERE users.id = ?',
-                    [req.body.firstName, req.body.lastName, req.body.gender, req.body.birthday, req.body.location, token.data.id]
+                    'UPDATE users SET firstName = ?, lastName = ?, gender = ?, birthday = ?, location = ?, lastUpdated = ? WHERE users.id = ?',
+                    [req.body.firstName, req.body.lastName, req.body.gender, req.body.birthday, req.body.location, new Date(), token.data.id]
                 ).then(async () => {
                     await sqlQuery(
                         'SELECT * FROM users WHERE id = ?', [token.data.id]
