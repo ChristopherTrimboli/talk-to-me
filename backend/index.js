@@ -167,7 +167,6 @@ app.post('/updateProfile', async (req, res) => {
                     await sqlQuery(
                         'SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE id = ?', [token.data.id]
                     ).then(async results => {
-                        delete results[0].password
                         await signToken(results[0])
                         .then(token => {
                             res.status(200).send({message: 'Profile Updated', token: token})
