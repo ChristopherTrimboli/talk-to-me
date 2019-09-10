@@ -17,6 +17,7 @@ import FormControl from '@material-ui/core/FormControl';
 import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import moment from 'moment'
 
 
 const CreateProfile = (props) => {
@@ -185,6 +186,21 @@ const CreateProfile = (props) => {
           <Grid item xs={6}>
             <Typography variant="subtitle2">Last Name: 
               <Typography variant="body2">{lastName}</Typography>
+            </Typography>          
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="subtitle2">Gender:
+              <Typography variant="body2">{gender}</Typography>
+            </Typography>
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="subtitle2">Birthday: 
+              <Typography variant="body2">{moment(birthday).format('MMMM Do YYYY')}</Typography>
+            </Typography>          
+          </Grid>
+          <Grid item xs={6}>
+            <Typography variant="subtitle2">Location: 
+              <Typography variant="body2">{location}</Typography>
             </Typography>          
           </Grid>
         </Grid>
