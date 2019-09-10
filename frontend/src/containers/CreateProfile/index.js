@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
@@ -10,6 +10,13 @@ import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 
 
 const CreateProfile = (props) => {
@@ -24,8 +31,11 @@ const CreateProfile = (props) => {
     paper: {
       padding: theme.spacing(3, 2),
       margin: theme.spacing(5, 5),
-      height: '40vh',
+      minHeight: '40vh',
       position: 'relative'
+    },
+    formControl: {
+      minWidth: '100%',
     },
     stepButtons: {
       position: 'absolute',
@@ -49,10 +59,21 @@ const CreateProfile = (props) => {
     return ['Create your Profile', 'Upload Pictures', 'Review'];
   }
 
-  const [activeStep, setActiveStep] = React.useState(0);
-  const [skipped, setSkipped] = React.useState(new Set());
-  const [firstName, setFirstName] = React.useState('');
-  const [lastName, setLastName] = React.useState('');
+  const [activeStep, setActiveStep] = useState(0);
+  const [skipped, setSkipped] = useState(new Set());
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [gender, setGender] = useState('');
+  const [birthday, setBirthday] = useState(new Date());
+  const [location, setLocation] = useState('');
+
+  useEffect(() => {
+    setFirstName(props.userData.firstName || '');
+    setLastName(props.userData.lastName || '');
+    setGender(props.userData.gender || '');
+    setBirthday(props.userData.birthday || new Date());
+    setLocation(props.userData.location || '');
+  }, [props.userData.firstName, props.userData.lastName, props.userData.gender, props.userData.birthday, props.userData.location]);
 
   const steps = getSteps();
   const classes = useStyles();
@@ -75,7 +96,7 @@ const CreateProfile = (props) => {
       <div>
         <Grid container spacing={4} className={classes.grid}>
           {/* <Avatar alt="User Avatar" src={props.userData && props.userData.avatar ? props.userData.avatar : emptyProfile} className={classes.avatar} /> */}
-          <Grid item xs={6}>
+          <Grid item lg={6} md={6} sm={6} xs={12}>
             <TextField
               autoFocus
               margin="dense"
@@ -88,7 +109,7 @@ const CreateProfile = (props) => {
               required
             />
           </Grid>
-          <Grid item xs={6}>
+          <Grid item lg={6} md={6} sm={6} xs={12}>
             <TextField
               autoFocus
               margin="dense"
@@ -100,6 +121,52 @@ const CreateProfile = (props) => {
               onChange={(e) => setLastName(e.target.value)}
               required
             />
+          </Grid>
+          <Grid item lg={4} md={4} sm={4} xs={12}>
+            <FormControl required className={classes.formControl}>
+              <InputLabel shrink htmlFor="gender-input">Gender</InputLabel>
+              <Select
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                inputProps={{
+                  name: 'Gender',
+                  id: 'gender-input',
+                }}
+              >
+                <MenuItem value={'Male'}>Male</MenuItem>
+                <MenuItem value={'Female'}>Female</MenuItem>
+                <MenuItem value={'Non-Binary'}>Non-Binary</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item lg={4} md={4} sm={4} xs={12}>
+            <MuiPickersUtilsProvider utils={DateFnsUtils}>
+              <KeyboardDatePicker
+                id="date-picker-dialog"
+                label="Birthday"
+                format="MM/dd/yyyy"
+                value={birthday}
+                onChange={(birthday) => setBirthday(birthday)}
+                KeyboardButtonProps={{
+                  'aria-label': 'change date',
+                }}
+                required
+                className={classes.formControl}
+              />
+            </MuiPickersUtilsProvider>
+          </Grid>
+          <Grid item lg={4} md={4} sm={4} xs={12}>
+            <TextField
+                autoFocus
+                margin="dense"
+                id="location"
+                label="Location"
+                type="text"
+                value={location}
+                fullWidth
+                onChange={(e) => setLocation(e.target.value)}
+                required
+              />
           </Grid>
         </Grid>
       </div>
@@ -222,7 +289,7 @@ const CreateProfile = (props) => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={() => activeStep === 2 ? props.updateProfile(props.userData.id, firstName, lastName) : null}
+                  onClick={() => activeStep === 2 ? props.updateProfile(props.userData.id, firstName, lastName, gender, birthday, location) : null}
                   className={classes.button}
                 >
                   Finish

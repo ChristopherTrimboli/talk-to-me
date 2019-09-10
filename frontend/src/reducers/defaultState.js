@@ -1,5 +1,16 @@
 import Immutable from 'immutable'
 
+export const userDataSchema = {
+    loggedIn: false,
+    id: null,
+    email: '',
+    firstName: '',
+    lastName: '',
+    gender: null,
+    birthday: null,
+    location: null
+}
+
 export default Immutable.fromJS({
     navDrawer: false,
     loginDialog: {
@@ -8,13 +19,7 @@ export default Immutable.fromJS({
     registerDialog: {
         visible: false
     },
-    userData: {
-        loggedIn: false,
-        id: null,
-        email: '',
-        firstName: '',
-        lastName: ''
-    },
+    userData: userDataSchema,
     snackbar: {
         open: false,
         variant: '',

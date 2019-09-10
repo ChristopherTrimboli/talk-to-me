@@ -24,11 +24,14 @@ const App = (storeProps) => {
         loggedIn: true,
         id: tokenData.id,
         email: tokenData.email,
-        firstName: tokenData.first_name,
-        lastName: tokenData.last_name
+        firstName: tokenData.firstName,
+        lastName: tokenData.lastName,
+        gender: tokenData.gender,
+        birthday: tokenData.birthday,
+        location: tokenData.location
       }
       storeProps.setUserData(userData);
-      storeProps.setSnackbar(true, 'success', `Welcome ${userData.firstName} ${userData.lastName} :)`)
+      storeProps.setSnackbar(true, 'success', `Welcome ${userData.firstName || ''} ${userData.lastName || ''} :)`)
     }
     else{
       localStorage.removeItem('token');

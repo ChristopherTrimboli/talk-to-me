@@ -2,6 +2,7 @@ import * as ACTIONS from '../constants/actions.js';
 import {API_URL, API_PORT} from '../constants/enviroment.js';
 import history from '../history.js'
 import jwt from 'jsonwebtoken'
+import {userDataSchema} from '../reducers/defaultState.js';
 
 export const postData = async (data, endpoint) => {
     try{
@@ -94,8 +95,11 @@ export const submitLogin = (email, password) => {
                 const userData = {
                     email: token.data.email,
                     id: token.data.id,
-                    firstName: token.data.first_name,
-                    lastName: token.data.last_name
+                    firstName: token.data.firstName,
+                    lastName: token.data.lastName,
+                    gender: token.data.gender,
+                    birthday: token.data.birthday,
+                    location: token.data.location
                 }
                 dispatch(setUserData(userData))
                 dispatch(setSnackbar(true, 'success', `Welcome ${userData.firstName || ''} ${userData.lastName || ''} :)`))
@@ -131,27 +135,23 @@ export const submitRegister = (email, password) => {
 }
 
 export const logout = () => {
-    const emptyUser = {
-        loggedIn: false,
-        id: null,
-        email: '',
-        firstName: '',
-        lastName: ''
-    }
     return function(dispatch){
         localStorage.removeItem('token')
-        dispatch(setUserData(emptyUser))
+        dispatch(setUserData(userDataSchema))
         dispatch(setSnackbar(true, 'info', 'Logged out... see you next time :/'))
         history.push('/')
     }
 }
 
-export const updateProfile = (userId, firstName, lastName) => {
+export const updateProfile = (userId, firstName, lastName, gender, birthday, location) => {
     return dispatch => {
         const data = {
             userId,
             firstName,
-            lastName
+            lastName,
+            gender,
+            birthday,
+            location
         }
         postData(data, '/updateProfile')
         .then(responseData => {
@@ -161,11 +161,14 @@ export const updateProfile = (userId, firstName, lastName) => {
                 const userData = {
                     email: token.data.email,
                     id: token.data.id,
-                    firstName: token.data.first_name,
-                    lastName: token.data.last_name
+                    firstName: token.data.firstName,
+                    lastName: token.data.lastName,
+                    gender: token.data.gender,
+                    birthday: token.data.birthday,
+                    location: token.data.location
                 }
                 dispatch(setUserData(userData))
-                dispatch(setSnackbar(true, 'success', 'Profile Updated! Welcome ' + userData.firstName + ' ' + userData.lastName + ' :)'))
+                dispatch(setSnackbar(true, 'success', `Profile Updated! Welcome ${userData.firstName || ''} ${userData.lastName || ''} :)`))
             }
             if(responseData.response.status === 500){
                 dispatch(setSnackbar(true, 'error', 'Error Updating Profile :('))

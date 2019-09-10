@@ -76,7 +76,6 @@ const sqlQuery = (query, params) => {
         try{
             pool.query(query, params, (error, results) => {
                 if (error) {
-                    console.log(error)
                     reject(error)
                 }
                 else{
@@ -117,19 +116,23 @@ app.post('/register', async (req, res) => {
 })
 
 app.post('/login', async (req, res) => {
-    await sqlQuery('SELECT * FROM users WHERE email = ?', [req.body.email])
+    await sqlQuery('SELECT password FROM users WHERE email = ?', [req.body.email])
     .then(results => {
         if(results.length > 0){
             bcrypt.compare(req.body.password, results[0].password, async (err, isMatch) => {
                 if(isMatch){
-                    delete results[0].password
-                    await signToken(results[0])
-                    .then(token => {
-                        res.status(200).send({message: 'Login Successful', token: token})
+                    await sqlQuery('SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE email = ?', [req.body.email])
+                    .then(async results => {
+                        await signToken(results[0])
+                        .then(token => {
+                            res.status(200).send({message: 'Login Successful', token: token})
+                        })
+                        .catch(e => {
+                            res.status(500).send({error: 'Token failed to sign'})
+                        })
                     })
-                    .catch(e => {
-                        console.log(e)
-                        res.status(500).send({error: 'Token failed to sign'})
+                    .catch(error => {
+                        res.status(500).send(error)
                     })
                 }
                 else{
@@ -152,12 +155,12 @@ app.post('/updateProfile', async (req, res) => {
             if(isValid){
                 const token = jwt.decode(req.body.token);
                 await sqlQuery(
-                    'UPDATE users SET first_name = ?, last_name = ? WHERE users.id = ?',
-                    [req.body.firstName, req.body.lastName, token.data.id]
+                    'UPDATE users SET firstName = ?, lastName = ?, gender = ?, birthday = ?, location = ? WHERE users.id = ?',
+                    [req.body.firstName, req.body.lastName, req.body.gender, req.body.birthday, req.body.location, token.data.id]
                 ).then(async () => {
                     await sqlQuery(
                         'SELECT * FROM users WHERE id = ?', [token.data.id]
-                    ).then(async (results) => {
+                    ).then(async results => {
                         delete results[0].password
                         await signToken(results[0])
                         .then(token => {
@@ -175,7 +178,6 @@ app.post('/updateProfile', async (req, res) => {
             }
         })
         .catch(e => {
-            console.log(e)
             res.status(500).send({error: 'Tokin not valid.'})
         })
     }
