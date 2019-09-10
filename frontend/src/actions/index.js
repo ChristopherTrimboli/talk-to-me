@@ -90,6 +90,7 @@ export const submitLogin = (email, password) => {
             if(responseData.response.status === 200){
                 localStorage.setItem('token', responseData.data.token);
                 const token = jwt.decode(responseData.data.token);
+                localStorage.setItem('tokenExpiration', token.exp);
                 const userData = {
                     email: token.data.email,
                     id: token.data.id,

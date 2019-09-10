@@ -20,7 +20,7 @@ else{
     host: 'localhost',
     port: '3306',
     user: 'root',
-    password: 'HelloThere69',
+    password: '#HelloThere69',
     database: 'talk-to-me',
     insecureAuth : true,
     waitForConnections: true,

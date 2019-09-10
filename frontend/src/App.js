@@ -15,17 +15,25 @@ import jwt from 'jsonwebtoken'
 
 const App = (storeProps) => {
 
-  if(!storeProps.userData.loggedIn && localStorage.getItem('token')){
-    const tokenData = jwt.decode(localStorage.getItem('token')).data
-    const userData = {
-      loggedIn: true,
-      id: tokenData.id,
-      email: tokenData.email,
-      firstName: tokenData.first_name,
-      lastName: tokenData.last_name
+  // Persitent login, check for token and expiration date.
+  if(!storeProps.userData.loggedIn && localStorage.getItem('token') && localStorage.getItem('tokenExpiration')){
+    const tokenExpiration = new Date(localStorage.getItem('tokenExpiration') * 1000);
+    if(new Date() < tokenExpiration){
+      const tokenData = jwt.decode(localStorage.getItem('token')).data
+      const userData = {
+        loggedIn: true,
+        id: tokenData.id,
+        email: tokenData.email,
+        firstName: tokenData.first_name,
+        lastName: tokenData.last_name
+      }
+      storeProps.setUserData(userData);
+      storeProps.setSnackbar(true, 'success', `Welcome ${userData.firstName} ${userData.lastName} :)`)
     }
-    storeProps.setUserData(userData);
-    storeProps.setSnackbar(true, 'success', `Welcome ${userData.firstName} ${userData.lastName} :)`)
+    else{
+      localStorage.removeItem('token');
+      localStorage.removeItem('tokenExpiration')
+    }
   }
 
   return (
