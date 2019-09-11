@@ -24,7 +24,7 @@ const AddressAutocomplete = (props) => {
                 }
             })
             const json = await response.json()
-            setSuggestions(json.predictions.length ? json.predictions.map(value => value.description) : [])
+            setSuggestions(json.length > 0 ? json : [])
         }
         catch(error){
             console.log(error);

@@ -104,7 +104,8 @@ app.post('/googleLocation', async (req, res) => {
                     'Content-Type': 'application/json',
                 }
             })
-            const json = await response.json()
+            let json = await response.json()
+            json = json.predictions.map(element => element.description)
             res.status(200).send(json)
         }
     })
