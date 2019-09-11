@@ -1,18 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import MenuItem from '@material-ui/core/MenuItem';
 import TextField from '@material-ui/core/TextField';
 import {API_URL, API_PORT} from '../../constants/enviroment.js';
 
 const AddressAutocomplete = (props) => {
 
-    const [location, setLocation] = useState(props.userData.location || '');
     const [suggestions, setSuggestions] = useState([]);
     const [isOpen, setIsOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState(0);
-
-    useEffect(() => {
-        setLocation(props.userData.location || '');
-    }, [props.userData.location]);
 
     const searchGooglePlaces = async string => {
         const query = string.split(' ').join('+');
@@ -37,16 +32,16 @@ const AddressAutocomplete = (props) => {
     }
 
     const handleChange = value => {
-        setLocation(value)
+        props.setLocation(value)
         if(value.length >= 2){
-            searchGooglePlaces(location)
+            searchGooglePlaces(props.location)
             setIsOpen(true)
         }
         props.onChange(value)
     }
 
     const handleSelect = index => {
-        setLocation(suggestions[index])
+        props.setLocation(suggestions[index])
         setIsOpen(false)
         props.onChange(suggestions[index])
     }
@@ -64,12 +59,13 @@ const AddressAutocomplete = (props) => {
                 }
                 break;
             case 'Backspace':
-                if(location.length <= 1){
+                if(props.location.length <= 1){
                     setIsOpen(false)
                 }
                 break;
             case 'Enter':
-                setLocation(suggestions[selectedItem])
+                props.setLocation(suggestions[selectedItem])
+                props.onChange(suggestions[selectedItem])
                 setIsOpen(false)
                 break;
             default:
@@ -87,7 +83,7 @@ const AddressAutocomplete = (props) => {
         <div>
             <TextField 
                 onChange={(e) => handleChange(e.target.value)}
-                value={location}
+                value={props.location}
                 label="Location"
                 fullWidth={true}
                 onKeyDown={(e) => handleKeyDown(e)}

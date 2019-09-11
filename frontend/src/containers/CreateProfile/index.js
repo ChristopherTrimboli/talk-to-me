@@ -154,7 +154,7 @@ const CreateProfile = (props) => {
             </MuiPickersUtilsProvider>
           </Grid>
           <Grid item lg={4} md={4} sm={4} xs={12}>
-            <AddressAutocomplete value={location} onChange={setLocation} {...props}/>
+            <AddressAutocomplete location={location} setLocation={setLocation} onChange={setLocation}/>
           </Grid>
         </Grid>
       </div>
