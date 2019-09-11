@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
-// import Avatar from '@material-ui/core/Avatar';
 import Grid from '@material-ui/core/Grid';
-// import emptyProfile from '../../assets/emptyProfile.jpg'
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
 import StepLabel from '@material-ui/core/StepLabel';
@@ -18,7 +16,7 @@ import 'date-fns';
 import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import moment from 'moment'
-
+import AddressAutocomplete from './AddressAutocomplete';
 
 const CreateProfile = (props) => {
   const useStyles = makeStyles(theme => ({
@@ -96,7 +94,6 @@ const CreateProfile = (props) => {
     return (
       <div>
         <Grid container spacing={4} className={classes.grid}>
-          {/* <Avatar alt="User Avatar" src={props.userData && props.userData.avatar ? props.userData.avatar : emptyProfile} className={classes.avatar} /> */}
           <Grid item lg={6} md={6} sm={6} xs={12}>
             <TextField
               autoFocus
@@ -157,17 +154,7 @@ const CreateProfile = (props) => {
             </MuiPickersUtilsProvider>
           </Grid>
           <Grid item lg={4} md={4} sm={4} xs={12}>
-            <TextField
-                autoFocus
-                margin="dense"
-                id="location"
-                label="Location"
-                type="text"
-                value={location}
-                fullWidth
-                onChange={(e) => setLocation(e.target.value)}
-                required
-              />
+            <AddressAutocomplete value={location} onChange={setLocation} {...props}/>
           </Grid>
         </Grid>
       </div>

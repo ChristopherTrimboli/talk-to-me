@@ -6,6 +6,8 @@ const http = require('http');
 const bcrypt = require('bcrypt');
 const Promise = require('bluebird');
 const jwt = require('jsonwebtoken');
+const cryptoRandomString = require('crypto-random-string');
+const fetch = require('node-fetch');
 const http_port = 3000;
 const TOKEN_SECRET = process.env.NODE_ENV === "production" ? process.env.TOKEN_SECRET : 'verysecretsecret';
 
@@ -88,6 +90,29 @@ const sqlQuery = (query, params) => {
         }
     });
 }
+
+app.post('/googleLocation', async (req, res) => {
+    const session = cryptoRandomString({length: 10});
+    const API_KEY = 'AIzaSyC4kxgg5gNToXpDHjIGToetF9sOGabN-Sg'
+    const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${req.body.query}&key=${API_KEY}&sessiontoken=${session}`;
+    await verifyToken(req.body.token)
+    .then(async isValid => {
+        if(isValid){
+            const response = await fetch(URL, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            const json = await response.json()
+            res.status(200).send(json)
+        }
+    })
+    .catch(e => {
+        console.log(e)
+        res.status(500).send()
+    })
+})
 
 app.post('/register', async (req, res) => {
     await isEmailDuplicate(req.body.email)
