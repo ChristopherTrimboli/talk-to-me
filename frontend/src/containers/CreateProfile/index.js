@@ -17,21 +17,24 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import moment from 'moment'
 import AddressAutocomplete from './AddressAutocomplete';
+import { isMobile } from '../../constants/enviroment';
 
 const CreateProfile = (props) => {
   const useStyles = makeStyles(theme => ({
     root: {
       height: '100%',
-      marginTop: '5vh'
+      padding: theme.spacing(2, 2)
     },
     header: {
       textAlign: 'center',
     },
     paper: {
-      padding: theme.spacing(3, 2),
-      margin: theme.spacing(5, 5),
+      margin: isMobile ? '0' : theme.spacing(1, 1),
       minHeight: '40vh',
-      position: 'relative'
+      position: 'relative',
+      marginBottom: '70px',
+      padding: '10px',
+      paddingBottom: '70px'
     },
     formControl: {
       minWidth: '100%',
@@ -51,11 +54,17 @@ const CreateProfile = (props) => {
     },
     grid: {
       padding: '20px'
+    },
+    stepper: {
+      padding: isMobile ? '10px' : '20px'
+    },
+    stepLabel: {
+      fontSize: isMobile ? '12px' : '0.875rem'
     }
   }));
 
   const getSteps = () => {
-    return ['Create your Profile', 'Upload Pictures', 'Review'];
+    return ['Create Profile', 'Upload Pictures', 'Review'];
   }
 
   const [activeStep, setActiveStep] = useState(0);
@@ -195,9 +204,9 @@ const CreateProfile = (props) => {
     )
   }
 
-  function isStepOptional(step) {
-    return step === 1;
-  }
+  // function isStepOptional(step) {
+  //   return step === 1;
+  // }
 
   function isStepSkipped(step) {
     return skipped.has(step);
@@ -218,20 +227,20 @@ const CreateProfile = (props) => {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   }
 
-  function handleSkip() {
-    if (!isStepOptional(activeStep)) {
-      // You probably want to guard against something like this,
-      // it should never occur unless someone's actively trying to break something.
-      throw new Error("You can't skip a step that isn't optional.");
-    }
+  // function handleSkip() {
+  //   if (!isStepOptional(activeStep)) {
+  //     // You probably want to guard against something like this,
+  //     // it should never occur unless someone's actively trying to break something.
+  //     throw new Error("You can't skip a step that isn't optional.");
+  //   }
 
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
-    setSkipped(prevSkipped => {
-      const newSkipped = new Set(prevSkipped.values());
-      newSkipped.add(activeStep);
-      return newSkipped;
-    });
-  }
+  //   setActiveStep(prevActiveStep => prevActiveStep + 1);
+  //   setSkipped(prevSkipped => {
+  //     const newSkipped = new Set(prevSkipped.values());
+  //     newSkipped.add(activeStep);
+  //     return newSkipped;
+  //   });
+  // }
 
   // function handleReset() {
   //   setActiveStep(0);
@@ -240,19 +249,16 @@ const CreateProfile = (props) => {
   return (
     <div className={classes.root}>
         <Paper className={classes.paper}>
-            <Stepper activeStep={activeStep}>
+            <Stepper activeStep={activeStep} className={classes.stepper}>
                 {steps.map((label, index) => {
                 const stepProps = {};
                 const labelProps = {};
-                if (isStepOptional(index)) {
-                    labelProps.optional = <Typography variant="caption">Optional</Typography>;
-                }
                 if (isStepSkipped(index)) {
                     stepProps.completed = false;
                 }
                 return (
                     <Step key={label} {...stepProps}>
-                    <StepLabel {...labelProps}>{label}</StepLabel>
+                    <StepLabel {...labelProps} className={classes.stepLabel}>{label}</StepLabel>
                     </Step>
                 );
                 })}
@@ -264,16 +270,6 @@ const CreateProfile = (props) => {
               <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
                 Back
               </Button>
-              {isStepOptional(activeStep) && (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleSkip}
-                  className={classes.button}
-                >
-                  Skip
-                </Button>
-              )}
 
               {
                 activeStep !== 2 ? 
