@@ -105,7 +105,6 @@ const CreateProfile = (props) => {
         <Grid container spacing={4} className={classes.grid}>
           <Grid item lg={6} md={6} sm={6} xs={12}>
             <TextField
-              autoFocus
               margin="dense"
               id="firstName"
               label="First Name"
@@ -118,7 +117,6 @@ const CreateProfile = (props) => {
           </Grid>
           <Grid item lg={6} md={6} sm={6} xs={12}>
             <TextField
-              autoFocus
               margin="dense"
               id="lastName"
               label="Last Name"
