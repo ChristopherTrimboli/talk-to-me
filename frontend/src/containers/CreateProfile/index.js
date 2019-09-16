@@ -17,13 +17,17 @@ import DateFnsUtils from '@date-io/date-fns';
 import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
 import moment from 'moment'
 import AddressAutocomplete from './AddressAutocomplete';
+import InterestChips from './InterestChips'
 import { isMobile } from '../../constants/enviroment';
+import Chip from '@material-ui/core/Chip';
 
 const CreateProfile = (props) => {
   const useStyles = makeStyles(theme => ({
     root: {
       height: '100%',
-      padding: theme.spacing(2, 2)
+      padding: theme.spacing(2, 2),
+      maxWidth: '1000px',
+      margin: '0 auto'
     },
     header: {
       textAlign: 'center',
@@ -60,12 +64,13 @@ const CreateProfile = (props) => {
     },
     stepLabel: {
       fontSize: isMobile ? '12px' : '0.875rem'
+    },
+    chip: {
+      margin: theme.spacing(0.5),
     }
   }));
 
-  const getSteps = () => {
-    return ['Create Profile', 'Upload Pictures', 'Review'];
-  }
+  const classes = useStyles();
 
   const [activeStep, setActiveStep] = useState(0);
   const [skipped, setSkipped] = useState(new Set());
@@ -74,6 +79,7 @@ const CreateProfile = (props) => {
   const [gender, setGender] = useState('');
   const [birthday, setBirthday] = useState(new Date());
   const [location, setLocation] = useState('');
+  const [chipData, setChipData] = useState([]);
 
   useEffect(() => {
     setFirstName(props.userData.firstName || '');
@@ -81,17 +87,29 @@ const CreateProfile = (props) => {
     setGender(props.userData.gender || '');
     setBirthday(props.userData.birthday || new Date());
     setLocation(props.userData.location || '');
-  }, [props.userData.firstName, props.userData.lastName, props.userData.gender, props.userData.birthday, props.userData.location]);
+    setChipData(props.userData.interests || [
+      { key: 0, label: 'Dating' },
+      { key: 1, label: 'Friends' },
+      { key: 2, label: 'Hangout' },
+      { key: 3, label: 'Eating' },
+      { key: 4, label: 'Laughs' }
+    ]);
+
+  }, [props.userData.firstName, props.userData.lastName, props.userData.gender, props.userData.birthday, props.userData.location, props.userData.interests]);
+
+
+  const getSteps = () => {
+    return ['Create Profile', 'Upload Pictures', 'Review'];
+  }
 
   const steps = getSteps();
-  const classes = useStyles();
   
-  const getStepContent = (step) => {
+  const getStepContent = step => {
     switch (step) {
         case 0:
         return firstStep();
         case 1:
-        return 'Upload pictures here';
+        return secondStep();
         case 2:
         return thirdStep();
         default:
@@ -101,200 +119,196 @@ const CreateProfile = (props) => {
 
   const firstStep = () => {
     return (
-      <div>
-        <Grid container spacing={4} className={classes.grid}>
-          <Grid item lg={6} md={6} sm={6} xs={12}>
-            <TextField
-              margin="dense"
-              id="firstName"
-              label="First Name"
-              type="text"
-              value={firstName}
-              fullWidth
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-          </Grid>
-          <Grid item lg={6} md={6} sm={6} xs={12}>
-            <TextField
-              margin="dense"
-              id="lastName"
-              label="Last Name"
-              type="text"
-              value={lastName}
-              fullWidth
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </Grid>
-          <Grid item lg={4} md={4} sm={4} xs={12}>
-            <FormControl required className={classes.formControl}>
-              <InputLabel shrink htmlFor="gender-input">Gender</InputLabel>
-              <Select
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                inputProps={{
-                  name: 'Gender',
-                  id: 'gender-input',
-                }}
-              >
-                <MenuItem value={'Male'}>Male</MenuItem>
-                <MenuItem value={'Female'}>Female</MenuItem>
-                <MenuItem value={'Non-Binary'}>Non-Binary</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid item lg={4} md={4} sm={4} xs={12}>
-            <MuiPickersUtilsProvider utils={DateFnsUtils}>
-              <KeyboardDatePicker
-                id="date-picker-dialog"
-                label="Birthday"
-                format="MM/dd/yyyy"
-                value={birthday}
-                onChange={(birthday) => setBirthday(birthday)}
-                KeyboardButtonProps={{
-                  'aria-label': 'change date',
-                }}
-                required
-                className={classes.formControl}
-              />
-            </MuiPickersUtilsProvider>
-          </Grid>
-          <Grid item lg={4} md={4} sm={4} xs={12}>
-            <AddressAutocomplete location={location} setLocation={setLocation} onChange={setLocation}/>
-          </Grid>
+      <Grid container spacing={4} className={classes.grid}>
+        <Grid item lg={6} md={6} sm={12} xs={12}>
+          <TextField
+            margin="dense"
+            id="firstName"
+            label="First Name"
+            type="text"
+            value={firstName}
+            fullWidth
+            onChange={(e) => setFirstName(e.target.value)}
+            required
+          />
         </Grid>
-      </div>
+        <Grid item lg={6} md={6} sm={12} xs={12}>
+          <TextField
+            margin="dense"
+            id="lastName"
+            label="Last Name"
+            type="text"
+            value={lastName}
+            fullWidth
+            onChange={(e) => setLastName(e.target.value)}
+            required
+          />
+        </Grid>
+        <Grid item lg={3} md={3} sm={12} xs={12}>
+          <FormControl required className={classes.formControl}>
+            <InputLabel shrink htmlFor="gender-input">Gender</InputLabel>
+            <Select
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              inputProps={{
+                name: 'Gender',
+                id: 'gender-input',
+              }}
+            >
+              <MenuItem value={'Male'}>Male</MenuItem>
+              <MenuItem value={'Female'}>Female</MenuItem>
+              <MenuItem value={'Non-Binary'}>Non-Binary</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item lg={3} md={3} sm={12} xs={12}>
+          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+            <KeyboardDatePicker
+              id="date-picker-dialog"
+              label="Birthday"
+              format="MM/dd/yyyy"
+              value={birthday}
+              onChange={(birthday) => setBirthday(birthday)}
+              KeyboardButtonProps={{
+                'aria-label': 'change date',
+              }}
+              required
+              className={classes.formControl}
+            />
+          </MuiPickersUtilsProvider>
+        </Grid>
+        <Grid item lg={6} md={6} sm={12} xs={12}>
+          <AddressAutocomplete location={location} setLocation={setLocation} onChange={setLocation}/>
+        </Grid>
+        <Grid item lg={12} md={12} sm={12} xs={12}>
+          <InterestChips chipData={chipData} setChipData={setChipData}/>
+        </Grid>
+      </Grid>
+    )
+  }
+
+  const secondStep = () => {
+    return (
+      null
     )
   }
 
   const thirdStep = () => {
     return (
-      <div>
-        <Grid container spacing={4} className={classes.grid}>
-          <Grid item xs={6}>
-            <Typography variant="subtitle2">First Name: 
-              <Typography variant="body2">{firstName}</Typography>
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="subtitle2">Last Name: 
-              <Typography variant="body2">{lastName}</Typography>
-            </Typography>          
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="subtitle2">Gender:
-              <Typography variant="body2">{gender}</Typography>
-            </Typography>
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="subtitle2">Birthday: 
-              <Typography variant="body2">{moment(birthday).format('MMMM Do YYYY')}</Typography>
-            </Typography>          
-          </Grid>
-          <Grid item xs={6}>
-            <Typography variant="subtitle2">Location: 
-              <Typography variant="body2">{location}</Typography>
-            </Typography>          
-          </Grid>
+      <Grid container spacing={4} className={classes.grid}>
+        <Grid item xs={6}>
+          <Typography variant="subtitle2">First Name: 
+            <Typography variant="body2">{firstName}</Typography>
+          </Typography>
         </Grid>
-      </div>
+        <Grid item xs={6}>
+          <Typography variant="subtitle2">Last Name: 
+            <Typography variant="body2">{lastName}</Typography>
+          </Typography>          
+        </Grid>
+        <Grid item xs={6}>
+          <Typography variant="subtitle2">Gender:
+            <Typography variant="body2">{gender}</Typography>
+          </Typography>
+        </Grid>
+        <Grid item xs={6}>
+          <Typography variant="subtitle2">Birthday: 
+            <Typography variant="body2">{moment(birthday).format('MMMM Do YYYY')}</Typography>
+          </Typography>          
+        </Grid>
+        <Grid item xs={6}>
+          <Typography variant="subtitle2">Location: 
+            <Typography variant="body2">{location}</Typography>
+          </Typography>          
+        </Grid>
+        <Grid item xs={12}>
+          <Typography variant="subtitle2" style={{'marginBottom': '10px'}}>Interests: </Typography>    
+          {chipData.map(data => {
+            return (
+            <Chip
+                key={data.key}
+                label={data.label}
+                className={classes.chip}
+            />
+            );
+          })}      
+        </Grid>
+      </Grid>
     )
   }
 
-  // function isStepOptional(step) {
-  //   return step === 1;
-  // }
-
-  function isStepSkipped(step) {
+  const isStepSkipped = step => {
     return skipped.has(step);
   }
 
-  function handleNext() {
+  const handleNext = () => {
     let newSkipped = skipped;
     if (isStepSkipped(activeStep)) {
       newSkipped = new Set(newSkipped.values());
       newSkipped.delete(activeStep);
     }
-
     setActiveStep(prevActiveStep => prevActiveStep + 1);
     setSkipped(newSkipped);
   }
 
-  function handleBack() {
+  const handleBack = () => {
     setActiveStep(prevActiveStep => prevActiveStep - 1);
   }
 
-  // function handleSkip() {
-  //   if (!isStepOptional(activeStep)) {
-  //     // You probably want to guard against something like this,
-  //     // it should never occur unless someone's actively trying to break something.
-  //     throw new Error("You can't skip a step that isn't optional.");
-  //   }
-
-  //   setActiveStep(prevActiveStep => prevActiveStep + 1);
-  //   setSkipped(prevSkipped => {
-  //     const newSkipped = new Set(prevSkipped.values());
-  //     newSkipped.add(activeStep);
-  //     return newSkipped;
-  //   });
-  // }
-
-  // function handleReset() {
-  //   setActiveStep(0);
-  // }
-
   return (
     <div className={classes.root}>
-        <Paper className={classes.paper}>
-            <Stepper activeStep={activeStep} className={classes.stepper}>
-                {steps.map((label, index) => {
-                const stepProps = {};
-                const labelProps = {};
-                if (isStepSkipped(index)) {
-                    stepProps.completed = false;
-                }
-                return (
-                    <Step key={label} {...stepProps}>
-                    <StepLabel {...labelProps} className={classes.stepLabel}>{label}</StepLabel>
-                    </Step>
-                );
-                })}
-            </Stepper>
+      <Paper className={classes.paper}>
+        <Stepper activeStep={activeStep} className={classes.stepper}>
+            {steps.map((label, index) => {
+            const stepProps = {};
+            const labelProps = {};
+            if (isStepSkipped(index)) {
+                stepProps.completed = false;
+            }
+            return (
+                <Step key={label} {...stepProps}>
+                <StepLabel {...labelProps} className={classes.stepLabel}>{label}</StepLabel>
+                </Step>
+            );
+            })}
+        </Stepper>
 
-            {getStepContent(activeStep)}
+        {getStepContent(activeStep)}
 
-            <div className={classes.stepButtons}>
-              <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
-                Back
-              </Button>
+        <div className={classes.stepButtons}>
+          <Button disabled={activeStep === 0} onClick={handleBack} className={classes.button}>
+            Back
+          </Button>
 
-              {
-                activeStep !== 2 ? 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleNext}
-                  className={classes.button}
-                >
-                  {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
-                </Button>
-                : null
+          {
+            activeStep !== 2 ? 
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleNext}
+              className={classes.button}
+            >
+              {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
+            </Button>
+            : null
+          }
+          {
+            activeStep === 2 ? 
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => activeStep === 2 ? 
+                props.updateProfile(props.userData.id, firstName, lastName, gender, birthday, location, chipData.map(chip => chip.label))
+               : null
               }
-              {
-                activeStep === 2 ? 
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => activeStep === 2 ? props.updateProfile(props.userData.id, firstName, lastName, gender, birthday, location) : null}
-                  className={classes.button}
-                >
-                  Finish
-                </Button>
-                : null
-              }
-            </div>
-        </Paper>
+              className={classes.button}
+            >
+              Finish
+            </Button>
+            : null
+          }
+        </div>
+      </Paper>
     </div>
   );
 }

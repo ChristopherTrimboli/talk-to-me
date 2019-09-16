@@ -8,7 +8,8 @@ export const userDataSchema = {
     lastName: '',
     gender: null,
     birthday: null,
-    location: null
+    location: null,
+    interests: []
 }
 
 export default Immutable.fromJS({

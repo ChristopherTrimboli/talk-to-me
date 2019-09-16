@@ -91,6 +91,33 @@ const sqlQuery = (query, params) => {
     });
 }
 
+const updateInterests = (interests, userId) => {
+    return new Promise(async (resolve, reject) => {
+        await sqlQuery('DELETE from interests WHERE userId = ?', [userId])
+        .then(async () => {
+            interests.forEach(async interest => {
+                await sqlQuery('INSERT INTO interests (interest, userId, creationDate) VALUES (?, ?, ?)', [interest, userId, new Date()])
+            })
+            await sqlQuery('SELECT interest FROM interests WHERE userId = ?', [userId])
+            .then(interestResults => {
+                let newInterests = [];
+                for(let i = 0; i < interestResults.length; i++){
+                    newInterests.push({key: i, label: interestResults[i].interest})
+                }
+                resolve(newInterests)
+            })
+            .catch(e => {
+                console.log(e)
+                reject(e)
+            })
+        })
+        .catch(e => {
+            console.log(e)
+            reject(e)
+        })
+    });
+}
+
 app.post('/googleLocation', async (req, res) => {
     const session = cryptoRandomString({length: 10});
     const API_KEY = 'AIzaSyC4kxgg5gNToXpDHjIGToetF9sOGabN-Sg'
@@ -143,24 +170,35 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
     await sqlQuery('SELECT password FROM users WHERE email = ?', [req.body.email])
-    .then(results => {
-        if(results.length > 0){
-            bcrypt.compare(req.body.password, results[0].password, async (err, isMatch) => {
+    .then(passwordResults => {
+        if(passwordResults.length){
+            bcrypt.compare(req.body.password, passwordResults[0].password, async (err, isMatch) => {
                 if(isMatch){
                     await sqlQuery('SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE email = ?', [req.body.email])
-                    .then(async results => {
-                        await sqlQuery('UPDATE users SET lastLoginDate = ? WHERE id = ?', [new Date(), results[0].id])
-                        .then(async () => {
-                            await signToken(results[0])
-                            .then(token => {
-                                res.status(200).send({message: 'Login Successful', token: token})
+                    .then(async userResults => {
+                        await sqlQuery('SELECT interest FROM interests WHERE userId = ?', [userResults[0].id])
+                        .then(async interestResults => {
+                            let interests = [];
+                            for(let i = 0; i < interestResults.length; i++){
+                                interests.push({key: i, label: interestResults[i].interest})
+                            }
+                            await sqlQuery('UPDATE users SET lastLoginDate = ? WHERE id = ?', [new Date(), userResults[0].id])
+                            .then(async () => {
+                                userResults[0].interests = interests
+                                await signToken(userResults[0])
+                                .then(token => {
+                                    res.status(200).send({message: 'Login Successful', token: token})
+                                })
+                                .catch(e => {
+                                    res.status(500).send({error: 'Token failed to sign'})
+                                })
                             })
-                            .catch(e => {
-                                res.status(500).send({error: 'Token failed to sign'})
+                            .catch(error => {
+                                res.status(500).send(error) // Updating lastLoginTime failed
                             })
                         })
                         .catch(error => {
-                            res.status(500).send(error) // Updating lastLoginTime failed
+                            res.status(500).send(error) // Selecting interest failed
                         })
                     })
                     .catch(error => {
@@ -190,19 +228,27 @@ app.post('/updateProfile', async (req, res) => {
                     'UPDATE users SET firstName = ?, lastName = ?, gender = ?, birthday = ?, location = ?, lastUpdated = ? WHERE users.id = ?',
                     [req.body.firstName, req.body.lastName, req.body.gender, req.body.birthday, req.body.location, new Date(), token.data.id]
                 ).then(async () => {
-                    await sqlQuery(
-                        'SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE id = ?', [token.data.id]
-                    ).then(async results => {
-                        await signToken(results[0])
-                        .then(token => {
-                            res.status(200).send({message: 'Profile Updated', token: token})
+                    await updateInterests(req.body.interests, token.data.id)
+                    .then(async newInterests => {
+                        await sqlQuery('SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE id = ?', [token.data.id])
+                        .then(async results => {
+                            results[0].interests = newInterests;
+                            await signToken(results[0])
+                            .then(token => {
+                                res.status(200).send({message: 'Profile Updated', token: token})
+                            })
+                            .catch(e => {
+                                res.status(500).send({error: 'Error signing token'})
+                            })
+                        }).catch(error => {
+                            res.status(500).send(error)
                         })
-                        .catch(e => {
-                            res.status(500).send({error: 'Error signing token'})
-                        })
-                    }).catch(error => {
-                        res.status(500).send(error)
                     })
+                    .catch(e => {
+                        console.log(e)
+                        res.status(500).send({error: 'Error updating interests'})
+                    })
+
                 }).catch(error => {
                     res.status(500).send(error)
                 })

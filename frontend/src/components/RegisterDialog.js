@@ -12,8 +12,8 @@ const RegisterDialog = (props) => {
   const [password, setPassword] = useState('');
 
   return (
-    <div>
-      <Dialog open={props.registerDialog} onClose={() => props.toggleRegisterDialog()} aria-labelledby="form-dialog-title">
+    <Dialog open={props.registerDialog} onClose={() => props.toggleRegisterDialog()} aria-labelledby="form-dialog-title">
+      <form>
         <DialogTitle id="form-dialog-title">Register</DialogTitle>
         <DialogContent>
           <TextField
@@ -42,12 +42,12 @@ const RegisterDialog = (props) => {
           <Button onClick={() => props.toggleRegisterDialog()} color="secondary">
             Cancel
           </Button>
-          <Button onClick={() => props.submitRegister(email, password)} color="primary">
+          <Button type="submit" onClick={(e) => {e.preventDefault(); props.submitRegister(email, password)}} color="primary">
             Register
           </Button>
         </DialogActions>
-      </Dialog>
-    </div>
+      </form>
+    </Dialog>
   );
 }
 

@@ -99,7 +99,8 @@ export const submitLogin = (email, password) => {
                     lastName: token.data.lastName,
                     gender: token.data.gender,
                     birthday: token.data.birthday,
-                    location: token.data.location
+                    location: token.data.location,
+                    interests: token.data.interests
                 }
                 dispatch(setUserData(userData))
                 dispatch(setSnackbar(true, 'success', `Welcome ${userData.firstName || ''} ${userData.lastName || ''} :)`))
@@ -143,7 +144,7 @@ export const logout = () => {
     }
 }
 
-export const updateProfile = (userId, firstName, lastName, gender, birthday, location) => {
+export const updateProfile = (userId, firstName, lastName, gender, birthday, location, interests) => {
     return dispatch => {
         const data = {
             userId,
@@ -151,7 +152,8 @@ export const updateProfile = (userId, firstName, lastName, gender, birthday, loc
             lastName,
             gender,
             birthday,
-            location
+            location,
+            interests
         }
         postData(data, '/updateProfile')
         .then(responseData => {
@@ -165,7 +167,8 @@ export const updateProfile = (userId, firstName, lastName, gender, birthday, loc
                     lastName: token.data.lastName,
                     gender: token.data.gender,
                     birthday: token.data.birthday,
-                    location: token.data.location
+                    location: token.data.location,
+                    interests: token.data.interests
                 }
                 dispatch(setUserData(userData))
                 dispatch(setSnackbar(true, 'success', `Profile Updated! Welcome ${userData.firstName || ''} ${userData.lastName || ''} :)`))
