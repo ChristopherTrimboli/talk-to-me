@@ -93,37 +93,31 @@ const sqlQuery = (query, params) => {
 
 const updateInterests = (interests, userId) => {
     return new Promise(async (resolve, reject) => {
-        await sqlQuery('DELETE from interests WHERE userId = ?', [userId])
-        .then(async () => {
+        try{
+            await sqlQuery('DELETE from interests WHERE userId = ?', [userId])
             interests.forEach(async interest => {
                 await sqlQuery('INSERT INTO interests (interest, userId, creationDate) VALUES (?, ?, ?)', [interest, userId, new Date()])
             })
-            await sqlQuery('SELECT interest FROM interests WHERE userId = ?', [userId])
-            .then(interestResults => {
-                let newInterests = [];
-                for(let i = 0; i < interestResults.length; i++){
-                    newInterests.push({key: i, label: interestResults[i].interest})
-                }
-                resolve(newInterests)
-            })
-            .catch(e => {
-                console.log(e)
-                reject(e)
-            })
-        })
-        .catch(e => {
+            const interestResults = await sqlQuery('SELECT interest FROM interests WHERE userId = ?', [userId])
+            let newInterests = [];
+            for(let i = 0; i < interestResults.length; i++){
+                newInterests.push({key: i, label: interestResults[i].interest})
+            }
+            resolve(newInterests)
+        }
+        catch(e){
             console.log(e)
             reject(e)
-        })
+        }
     });
 }
 
 app.post('/googleLocation', async (req, res) => {
-    const session = cryptoRandomString({length: 10});
-    const API_KEY = 'AIzaSyC4kxgg5gNToXpDHjIGToetF9sOGabN-Sg'
-    const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${req.body.query}&key=${API_KEY}&sessiontoken=${session}`;
-    await verifyToken(req.body.token)
-    .then(async isValid => {
+    try{
+        const session = cryptoRandomString({length: 10});
+        const API_KEY = 'AIzaSyC4kxgg5gNToXpDHjIGToetF9sOGabN-Sg'
+        const URL = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${req.body.query}&key=${API_KEY}&sessiontoken=${session}`;
+        const isValid = await verifyToken(req.body.token)
         if(isValid){
             const response = await fetch(URL, {
                 method: 'GET',
@@ -135,16 +129,16 @@ app.post('/googleLocation', async (req, res) => {
             json = json.predictions.map(element => element.description)
             res.status(200).send(json)
         }
-    })
-    .catch(e => {
+    }
+    catch(e){
         console.log(e)
-        res.status(500).send()
-    })
+        res.status(500).send({error: e})
+    }
 })
 
 app.post('/register', async (req, res) => {
-    await isEmailDuplicate(req.body.email)
-    .then(isDuplicate => {
+    try{
+        const isDuplicate = await isEmailDuplicate(req.body.email)
         if(isDuplicate){
             res.status(500).send({message: 'Email already exists'})
         }
@@ -154,56 +148,33 @@ app.post('/register', async (req, res) => {
                 await sqlQuery(
                     'INSERT INTO users (email, password, registerDate) VALUES (?, ?, ?)',
                     [req.body.email, hashedPass, new Date()]
-                ).then(results => {
-                    res.status(200).send({message: 'Registered succesfully'})
-                }).catch(error => {
-                    res.status(500).send(error)
-                })
+                )
+                res.status(200).send({message: 'Registered succesfully'})
             });
         }
-    })
-    .catch(error => {
-        console.log(error)
-        res.status(500).send({error: 'Caught error in: isEmailDuplicate()'})
-    })
+    }
+    catch(e){
+        console.log(e)
+        res.status(500).send({error: e})
+    }
 })
 
 app.post('/login', async (req, res) => {
-    await sqlQuery('SELECT password FROM users WHERE email = ?', [req.body.email])
-    .then(passwordResults => {
+    try{
+        const passwordResults = await sqlQuery('SELECT password FROM users WHERE email = ?', [req.body.email])
         if(passwordResults.length){
             bcrypt.compare(req.body.password, passwordResults[0].password, async (err, isMatch) => {
                 if(isMatch){
-                    await sqlQuery('SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE email = ?', [req.body.email])
-                    .then(async userResults => {
-                        await sqlQuery('SELECT interest FROM interests WHERE userId = ?', [userResults[0].id])
-                        .then(async interestResults => {
-                            let interests = [];
-                            for(let i = 0; i < interestResults.length; i++){
-                                interests.push({key: i, label: interestResults[i].interest})
-                            }
-                            await sqlQuery('UPDATE users SET lastLoginDate = ? WHERE id = ?', [new Date(), userResults[0].id])
-                            .then(async () => {
-                                userResults[0].interests = interests
-                                await signToken(userResults[0])
-                                .then(token => {
-                                    res.status(200).send({message: 'Login Successful', token: token})
-                                })
-                                .catch(e => {
-                                    res.status(500).send({error: 'Token failed to sign'})
-                                })
-                            })
-                            .catch(error => {
-                                res.status(500).send(error) // Updating lastLoginTime failed
-                            })
-                        })
-                        .catch(error => {
-                            res.status(500).send(error) // Selecting interest failed
-                        })
-                    })
-                    .catch(error => {
-                        res.status(500).send(error) // Selecting user data failed
-                    })
+                    const userResults = await sqlQuery('SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE email = ?', [req.body.email])
+                    const interestResults = await sqlQuery('SELECT interest FROM interests WHERE userId = ?', [userResults[0].id])
+                    let interests = [];
+                    for(let i = 0; i < interestResults.length; i++){
+                        interests.push({key: i, label: interestResults[i].interest})
+                    }
+                    await sqlQuery('UPDATE users SET lastLoginDate = ? WHERE id = ?', [new Date(), userResults[0].id])
+                    userResults[0].interests = interests
+                    const token = await signToken(userResults[0])
+                    res.status(200).send({message: 'Login Successful', token: token})          
                 }
                 else{
                     res.status(500).send({error: 'Login failed, incorrect credentials'})
@@ -213,53 +184,40 @@ app.post('/login', async (req, res) => {
         else{
             res.status(500).send({error: 'Login failed, email does not exist'})
         }
-    }).catch(error => {
-        res.status(500).send(error)
-    })
+    }
+    catch(e){
+        console.log(e)
+        res.status(500).send({error: e})
+    }
 })
 
 app.post('/updateProfile', async (req, res) => {
-    if(req.body.token){
-        await verifyToken(req.body.token)
-        .then(async (isValid) => {
+    try{
+        if(req.body.token){
+            const isValid = await verifyToken(req.body.token)
             if(isValid){
-                const token = jwt.decode(req.body.token);
+                let token = jwt.decode(req.body.token);
                 await sqlQuery(
                     'UPDATE users SET firstName = ?, lastName = ?, gender = ?, birthday = ?, location = ?, lastUpdated = ? WHERE users.id = ?',
                     [req.body.firstName, req.body.lastName, req.body.gender, req.body.birthday, req.body.location, new Date(), token.data.id]
-                ).then(async () => {
-                    await updateInterests(req.body.interests, token.data.id)
-                    .then(async newInterests => {
-                        await sqlQuery('SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE id = ?', [token.data.id])
-                        .then(async results => {
-                            results[0].interests = newInterests;
-                            await signToken(results[0])
-                            .then(token => {
-                                res.status(200).send({message: 'Profile Updated', token: token})
-                            })
-                            .catch(e => {
-                                res.status(500).send({error: 'Error signing token'})
-                            })
-                        }).catch(error => {
-                            res.status(500).send(error)
-                        })
-                    })
-                    .catch(e => {
-                        console.log(e)
-                        res.status(500).send({error: 'Error updating interests'})
-                    })
-
-                }).catch(error => {
-                    res.status(500).send(error)
-                })
+                )
+                const newInterests = await updateInterests(req.body.interests, token.data.id)
+                const userResults = await sqlQuery('SELECT id, email, firstName, lastName, gender, birthday, location FROM users WHERE id = ?', [token.data.id])
+                userResults[0].interests = newInterests;
+                token = await signToken(userResults[0])
+                res.status(200).send({message: 'Profile Updated', token: token})
             }
-        })
-        .catch(e => {
-            res.status(500).send({error: 'Tokin not valid.'})
-        })
-    }
-    else{
-        res.status(500).send({error: 'No token, Login and try again'})
+            else{
+                res.status(500).send({error: 'Token not valid.'})
+            }
+        }
+        else{
+            res.status(500).send({error: 'No token, Login and try again'})
+        }
+    } 
+    catch(e){
+        console.log(e)
+        res.status(500).send({error: e})
     }
 })
 
