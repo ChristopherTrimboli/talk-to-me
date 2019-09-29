@@ -4,7 +4,6 @@ const app = express();
 const cors = require('cors');
 const http = require('http');
 const bcrypt = require('bcrypt');
-const Promise = require('bluebird');
 const jwt = require('jsonwebtoken');
 const cryptoRandomString = require('crypto-random-string');
 const fetch = require('node-fetch');

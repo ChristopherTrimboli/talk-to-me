@@ -20,6 +20,7 @@ import AddressAutocomplete from './AddressAutocomplete';
 import InterestChips from './InterestChips'
 import { isMobile } from '../../constants/enviroment';
 import Chip from '@material-ui/core/Chip';
+import emptyImage from '../../assets/emptyImage.png'
 
 const CreateProfile = (props) => {
   const useStyles = makeStyles(theme => ({
@@ -67,6 +68,20 @@ const CreateProfile = (props) => {
     },
     chip: {
       margin: theme.spacing(0.5),
+    },
+    imageCard: {
+      width: "220px",
+      height: '220px',
+      margin: '0 auto'
+    },
+    image: {
+      height: '100%',
+      width: '100%',
+      objectFit: 'cover',
+      cursor: 'pointer',
+      '&:hover': {
+        opacity: 0.5
+      }
     }
   }));
 
@@ -80,6 +95,7 @@ const CreateProfile = (props) => {
   const [birthday, setBirthday] = useState(new Date());
   const [location, setLocation] = useState('');
   const [chipData, setChipData] = useState([]);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     setFirstName(props.userData.firstName || '');
@@ -187,9 +203,44 @@ const CreateProfile = (props) => {
     )
   }
 
+  const uploadImage = (index) => {
+    const input = document.getElementById(`imageInput-${index}`);
+    input.click();
+  }
+
+  const handleImageChange = (e, index) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+      let newArray = images;
+      newArray[index] = reader.result;
+      setImages(newArray)
+      document.getElementById('img-' + index).src = reader.result;
+    };
+    reader.onerror = function (error) {
+      console.log('Error reading image: ', error);
+    };
+  }
+
   const secondStep = () => {
     return (
-      null
+      <>
+        <Grid container spacing={4} className={classes.grid} style={{'paddingRight': '32px'}}>
+          {
+            Array(8).fill(null).map((value, index) => {
+              return(
+                <Grid item lg={3} md={3} sm={6} xs={12} key={index}>
+                  <Paper className={`${classes.imageCard} imageCard`}>
+                    <img src={images[index] ? images[index] : emptyImage} alt={`img-${index}`} id={`img-${index}`} className={classes.image} onClick={() => uploadImage(index)}/>
+                    <input type="file" id={`imageInput-${index}`} style={{'visibility': 'hidden'}} onChange={(e) => handleImageChange(e, index)}/>
+                  </Paper>
+                </Grid>
+              )
+            })
+          }
+        </Grid>
+      </>
     )
   }
 
