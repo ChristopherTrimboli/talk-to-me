@@ -13,6 +13,7 @@ import CreateProfile from './containers/CreateProfile/index.js'
 import { withRouter } from 'react-router-dom';
 import jwt from 'jsonwebtoken'
 import UserList from './containers/UserList';
+import VideoChat from './containers/VideoChat';
 
 const App = (storeProps) => {
 
@@ -47,6 +48,7 @@ const App = (storeProps) => {
       <Route path="/" exact render={() => <FrontPage {...storeProps}/> } />
       <Route path="/createProfile" exact render={() => <CreateProfile {...storeProps}/> }/>
       <Route path="/userList" exact render={() => <UserList {...storeProps}/> }/>
+      <Route path="/videoChat" exact render={() => <VideoChat {...storeProps}/> }/>
       <Snackbar { ...storeProps } />
       <Footer />
     </div>
