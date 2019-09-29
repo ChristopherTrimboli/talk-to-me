@@ -220,3 +220,38 @@ app.post('/updateProfile', async (req, res) => {
     }
 })
 
+app.post('/users', async (req, res) => {
+    try{
+        if(req.body.token){
+            const isValid = await verifyToken(req.body.token)
+            if(isValid){
+                const users = await sqlQuery('SELECT * FROM users', [])
+
+                for(let i = 0; i < users.length; i++){
+                    delete users[i].password
+                    delete users[i].lastUpdated
+                    delete users[i].registerDate
+                    delete users[i].lastLoginDate
+                    const interestResults = await sqlQuery('SELECT interest FROM interests WHERE userId = ?', [users[i].id])
+                    let interests = [];
+                    for(let i = 0; i < interestResults.length; i++){
+                        interests.push({key: i, label: interestResults[i].interest})
+                    }
+                    users[i].interests = interests;
+                }
+                res.status(200).send({message: 'Users: ', users: users})
+            }
+            else{
+                res.status(500).send({error: 'Token not valid.'})
+            }
+        }
+        else{
+            res.status(500).send({error: 'No token, Login and try again'})
+        }
+    } 
+    catch(e){
+        console.log(e)
+        res.status(500).send({error: e})
+    }
+})
+

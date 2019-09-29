@@ -25,5 +25,6 @@ export default Immutable.fromJS({
         open: false,
         variant: '',
         message: ''
-    }
+    },
+    users: []
 })

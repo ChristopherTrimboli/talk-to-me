@@ -172,9 +172,29 @@ export const updateProfile = (userId, firstName, lastName, gender, birthday, loc
                 }
                 dispatch(setUserData(userData))
                 dispatch(setSnackbar(true, 'success', `Profile Updated! Welcome ${userData.firstName || ''} ${userData.lastName || ''} :)`))
+                history.push('/userList')
             }
             if(responseData.response.status === 500){
                 dispatch(setSnackbar(true, 'error', 'Error Updating Profile :('))
+            }
+        })
+    }
+}
+
+export const getAllUsers = () => {
+    return dispatch => {
+        const data = {};
+        postData(data, '/users')
+        .then(responseData => {
+            if(responseData.response.status === 200){
+                const action = {
+                    type: ACTIONS.SET_USERS,
+                    users: responseData.data.users
+                }
+                dispatch(action)
+            }
+            if(responseData.response.status === 500){
+                dispatch(setSnackbar(true, 'error', 'Error Getting all Users :('))
             }
         })
     }

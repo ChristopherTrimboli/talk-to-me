@@ -83,6 +83,7 @@ const Navbar = (props) => {
             onClose={handleClose}
           >
             <MenuItem onClick={() => handleClose()}><Link to="/createProfile" className={classes.link}>Create Profile</Link></MenuItem>
+            <MenuItem onClick={() => handleClose()}><Link to="/userList" className={classes.link}>Meet People</Link></MenuItem>
             <MenuItem onClick={() => logout()}>Logout</MenuItem>
           </Menu>
         </Toolbar>

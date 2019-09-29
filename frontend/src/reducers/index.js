@@ -25,6 +25,8 @@ export default (state = defaultState, action) => {
             state = state.setIn(['snackbar', 'variant'], action.variant);
             state = state.setIn(['snackbar', 'message'], action.message);
             return state;
+        case ACTIONS.SET_USERS:
+            return state.setIn(['users'], action.users);
         default:
             return state;
     }

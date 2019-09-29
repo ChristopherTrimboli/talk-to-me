@@ -1,5 +1,5 @@
 import { createStructuredSelector, createSelector } from "reselect";
-import { getNavDrawer, getLoginDialog, getRegisterDialog, getUserData, getSnackbar } from "../getters";
+import { getNavDrawer, getLoginDialog, getRegisterDialog, getUserData, getSnackbar, getUsers} from "../getters";
 
 export const userData = createSelector(
     [getUserData],
@@ -22,6 +22,13 @@ export const navDrawer = createSelector(
     }
 )
 
+export const users = createSelector(
+    [getUsers],
+    (users) => {
+        return JSON.parse(JSON.stringify(users));
+    }
+)
+
 export const loginDialog = createSelector(
     [getLoginDialog],
     (loginDialog) => {
@@ -41,5 +48,6 @@ export default createStructuredSelector({
     loginDialog,
     registerDialog,
     userData,
-    snackbar
+    snackbar,
+    users
 })

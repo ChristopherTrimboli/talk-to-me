@@ -12,6 +12,7 @@ import FrontPage from './containers/FrontPage/index.js'
 import CreateProfile from './containers/CreateProfile/index.js'
 import { withRouter } from 'react-router-dom';
 import jwt from 'jsonwebtoken'
+import UserList from './containers/UserList';
 
 const App = (storeProps) => {
 
@@ -45,6 +46,7 @@ const App = (storeProps) => {
       <Navbar { ...storeProps }/>
       <Route path="/" exact render={() => <FrontPage {...storeProps}/> } />
       <Route path="/createProfile" exact render={() => <CreateProfile {...storeProps}/> }/>
+      <Route path="/userList" exact render={() => <UserList {...storeProps}/> }/>
       <Snackbar { ...storeProps } />
       <Footer />
     </div>
